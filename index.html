@@ -77,6 +77,8 @@
   .visit .num{font-size:14px}
   .down{color:var(--green)} .up{color:var(--red)}
   .x{border:0;background:none;color:var(--muted);font-size:13px}
+  .uplRow{display:flex;gap:10px}
+  .uplRow .upl{flex:1;cursor:pointer}
   .hidden{display:none!important}
   a{color:var(--green)}
   .ph .src{position:absolute;right:4px;top:4px;background:rgba(255,255,255,.9);color:var(--ink);font-size:11px;padding:1px 6px;border-radius:6px}
@@ -317,7 +319,11 @@
       </div>
     </div>
 
-    <label class="upl" for="fileIn" id="uplLabel">＋ 拍照或選照片</label>
+    <div class="uplRow" id="uplLabel">
+      <label class="upl" for="camIn">📷 拍照</label>
+      <label class="upl" for="fileIn">🖼 選照片</label>
+    </div>
+    <input type="file" id="camIn" accept="image/*" capture="environment" class="hidden">
     <input type="file" id="fileIn" accept="image/*" multiple class="hidden">
     <div style="height:10px"></div>
     <div class="grid" id="foodGrid"></div>
@@ -790,7 +796,7 @@ function toJpeg(img, max, q) {
   return c.toDataURL('image/jpeg', q);
 }
 
-$('fileIn').onchange = async e => {
+async function onPickFiles(e) {
   const files = Array.from(e.target.files); e.target.value = '';
   if (!files.length) return;
   // 用照片的拍攝(修改)時間當預設用餐時間；抓不到就用現在
@@ -803,8 +809,11 @@ $('fileIn').onchange = async e => {
   srcSeg($('pendSrc'), PEND.source, s => PEND.source = s);
   $('pend').classList.remove('hidden'); $('uplLabel').classList.add('hidden');
   for (const f of files) { try { PEND.imgs.push(await loadImg(f)); } catch (err) { PEND.imgs.push(null); } }
-  $('pendPrev').innerHTML = PEND.imgs.filter(Boolean).map(i => `<img src="${toJpeg(i, 160, 0.6)}">`).join('');
-};
+  $('pendPrev').innerHTML = PEND.imgs.filter(Boolean).map(i => `<img src="${toJpeg(i, 160, 0.6)}">`).join('')
+    || '<span class="muted">照片讀取失敗，請換一張或改用「選照片」</span>';
+}
+$('fileIn').onchange = onPickFiles;
+$('camIn').onchange = onPickFiles;
 function paintPendMeal() { mealSeg($('pendMeal'), PEND.meal, m => { PEND.meal = m; PEND.mealManual = true; }); }
 function checkPendDate() {
   const show = PEND.shotDate !== $('pendDate').value;
@@ -828,7 +837,7 @@ async function doUpload() {
   $('pendGo').disabled = true;
   LAST_SRC = p.source || '';
   try { localStorage.setItem('lastSrc', LAST_SRC); } catch (e) {}
-  let ok = 0;
+  let ok = 0, fail = '';
   for (let i = 0; i < p.imgs.length; i++) {
     $('pendGo').textContent = `上傳中 ${i + 1}/${p.imgs.length}…`;
     const img = p.imgs[i];
@@ -840,11 +849,12 @@ async function doUpload() {
       const rec = await run('uploadFood', { date, time, meal: p.meal, source: p.source || '', note, full, thumb });
       if (rec.date === CUR) { FOODS.push(rec); sortFoods(); renderFoods(); }
       ok++;
-    } catch (err) { toast('第 ' + (i + 1) + ' 張上傳失敗', 3000); }
+    } catch (err) { fail = '第 ' + (i + 1) + ' 張上傳失敗：' + (err && err.message || err); }
   }
   $('pendGo').disabled = false; $('pendGo').textContent = '上傳';
   cancelPend();
-  toast(date === CUR ? `已上傳 ${ok} 張` : `已上傳 ${ok} 張到 ${mdShort(date)}`);
+  if (fail) { alert(fail + '\n\n（成功 ' + ok + ' 張）'); }
+  else toast(date === CUR ? `已上傳 ${ok} 張` : `已上傳 ${ok} 張到 ${mdShort(date)}`);
   checkComplete();
 }
 
@@ -1254,7 +1264,7 @@ async function uploadRxImgs(rxId, imgs) {
       if (thumb.length > 45000) thumb = toJpeg(imgs[i], 220, 0.5);
       RX = await run('uploadRxPhoto', { rxId, full, thumb });
       renderRx();
-    } catch (err) { toast('第 ' + (i + 1) + ' 張上傳失敗', 3000); }
+    } catch (err) { fail = '第 ' + (i + 1) + ' 張上傳失敗：' + (err && err.message || err); }
   }
   toast('處方簽已上傳到雲端「處方簽」資料夾', 2500);
 }
