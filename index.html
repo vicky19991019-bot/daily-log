@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f4ee; --card:#fff; --ink:#2b2b28; --muted:#8a877d; --line:#e6e1d6;
+    --green:#3f7d4e; --green-soft:#e6f0e2; --red:#b5483a; --blue:#3a6ea5; --blue-soft:#e7eff8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+  header{position:sticky;top:0;z-index:10;background:var(--green);color:#fff;padding:12px 16px 0}
+  header h1{margin:0 0 8px;font-size:18px;font-weight:600;letter-spacing:.5px}
+  nav{display:flex;gap:4px}
+  nav button{flex:1;border:0;background:transparent;color:#cfe3d3;font-size:15px;padding:8px 0 10px;border-bottom:3px solid transparent}
+  nav button.on{color:#fff;border-bottom-color:#fff;font-weight:600}
+  main{max-width:640px;margin:0 auto;padding:12px 16px 80px}
+  section{display:none} section.on{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .card h2{margin:0 0 10px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:6px}
+  .card h4{margin:12px 0 6px;font-size:13px;color:var(--muted);font-weight:500}
+  .muted{color:var(--muted);font-size:13px}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .datebar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .datebar input{flex:1;text-align:center}
+  .nb{border:1px solid var(--line);background:#fff;border-radius:10px;width:40px;height:40px;font-size:18px;color:var(--green)}
+  input[type=date],input[type=time],input[type=number],input[type=text],textarea{
+    font:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#fff;width:100%;color:var(--ink)}
+  textarea{min-height:70px;resize:vertical}
+  label.f{display:block;font-size:13px;color:var(--muted);margin:8px 0 4px}
+  .seg{display:flex;flex-wrap:wrap;gap:6px}
+  .seg button,.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:14px;color:var(--ink)}
+  .seg button.on,.chip.on{background:var(--green);border-color:var(--green);color:#fff}
+  .seg.red button.on{background:var(--red);border-color:var(--red)}
+  .chip.blue{border-color:#c9d9ec;color:var(--blue);background:var(--blue-soft)}
+  .btn{border:0;background:var(--green);color:#fff;border-radius:12px;padding:11px 16px;font-size:15px;font-weight:600;width:100%}
+  .btn.ghost{background:var(--green-soft);color:var(--green)}
+  .btn.danger{background:#fff;color:var(--red);border:1px solid #ecc9c3}
+  .btns{display:flex;gap:8px;margin-top:12px}
+  .stepper{display:flex;align-items:center;gap:14px}
+  .stepper button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:22px;color:var(--blue)}
+  .stepper .n{font-size:28px;font-weight:700;color:var(--blue);min-width:48px;text-align:center}
+  .total{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--blue-soft);color:var(--blue);display:flex;justify-content:space-between;align-items:center}
+  .total b{font-size:20px}
+  .advice{background:#fff8e6;border-color:#f0dfb0}
+  .advice p{margin:0;white-space:pre-wrap}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .ph{position:relative;border-radius:10px;overflow:hidden;background:#eee;aspect-ratio:1;cursor:pointer}
+  .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .ph .tag{position:absolute;left:4px;top:4px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:1px 6px;border-radius:6px}
+  .ph .cap{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:11px;padding:10px 6px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .upl{display:block;text-align:center;border:2px dashed #b9d1bd;border-radius:12px;padding:14px;color:var(--green);font-weight:600;background:var(--green-soft)}
+  .pend{border:1px solid #b9d1bd;background:#f8fbf6;border-radius:12px;padding:12px;margin-bottom:10px}
+  .pend .prev{display:flex;gap:6px;overflow-x:auto;margin-bottom:6px}
+  .pend .prev img{width:72px;height:72px;object-fit:cover;border-radius:8px;flex:none}
+  .warn{background:#fff8e6;border-radius:8px;padding:6px 10px;font-size:13px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .warn button{border:0;background:#f0dfb0;border-radius:8px;padding:4px 10px;font-size:13px}
+  #status{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:rgba(43,43,40,.88);color:#fff;padding:7px 16px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40}
+  #status.show{opacity:1}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .stat{background:var(--bg);border-radius:10px;padding:10px}
+  .stat b{display:block;font-size:20px}
+  .tbl{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+  th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:center}
+  th{color:var(--muted);font-weight:500}
+  td.pd{color:var(--red);font-weight:600}
+  .day{margin-bottom:14px}
+  .day h3{font-size:14px;margin:0 0 6px;display:flex;justify-content:space-between}
+  .chart{width:100%;height:auto}
+  .visit{border-top:1px solid var(--line);padding:10px 0}
+  .visit:first-child{border-top:0}
+  .visit .hd{display:flex;justify-content:space-between;align-items:center}
+  .visit .num{font-size:14px}
+  .down{color:var(--green)} .up{color:var(--red)}
+  .x{border:0;background:none;color:var(--muted);font-size:13px}
+  .hidden{display:none!important}
+  a{color:var(--green)}
+  .ph .src{position:absolute;right:4px;top:4px;background:rgba(255,255,255,.9);color:var(--ink);font-size:11px;padding:1px 6px;border-radius:6px}
+  .seg.src button.on{background:#c07a2c;border-color:#c07a2c}
+  .qi{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+  .qi:first-child{border-top:0}
+  .qi .t{flex:1;white-space:pre-wrap}
+  .qi .a{color:var(--green);font-size:13px;margin-top:2px;white-space:pre-wrap}
+  .sm{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 10px;font-size:13px;flex:none}
+  .sm.ok{background:var(--green-soft);border-color:#b9d1bd;color:var(--green)}
+  .rx{border-top:1px solid var(--line);padding:10px 0}
+  .rx:first-child{border-top:0}
+  .rx.cur{background:#f8fbf6;margin:0 -14px;padding:10px 14px;border-radius:10px}
+  .rx .hd{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .badge{display:inline-block;background:var(--green);color:#fff;font-size:11px;padding:1px 7px;border-radius:6px;margin-left:4px}
+  details summary{cursor:pointer;color:var(--muted);font-size:13px;margin-top:8px}
+  /* 經期 */
+  .flowdots{display:inline-flex;gap:3px;vertical-align:middle;margin-left:6px}
+  .flowdots i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#f2c4bd}
+  .flowdots i.f1{background:#f6d8d3} .flowdots i.f2{background:#e9a197} .flowdots i.f3{background:#d0675a} .flowdots i.f4{background:#a8382b}
+  .pinfo{background:#fbeeec;color:var(--red);border-radius:10px;padding:8px 12px;margin-top:10px;font-size:14px}
+  /* 加油橫幅 */
+  .cheer{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#fff4dc,#e9f3e5);border:1px solid #efe1bd;border-radius:14px;padding:12px 14px;margin-bottom:12px}
+  .cheer .em{font-size:34px;animation:bob 2.4s ease-in-out infinite}
+  .cheer .msg{flex:1;font-size:14px}
+  .cheer .streak{font-size:12px;color:#c07a2c;font-weight:600;margin-top:2px}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+  /* 慶祝（全螢幕） */
+  #fx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:60}
+  #cele{position:fixed;inset:0;z-index:55;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;overflow:hidden;animation:fadein .3s}
+  #cele.party{background:radial-gradient(circle at 50% 42%,rgba(255,246,214,.97),rgba(255,201,150,.93) 55%,rgba(246,140,120,.92))}
+  #cele.gentle{background:radial-gradient(circle at 50% 42%,rgba(250,255,246,.97),rgba(204,232,203,.94) 60%,rgba(160,206,170,.93))}
+  #cele .rays{position:absolute;left:50%;top:42%;width:240vmax;height:240vmax;margin:-120vmax 0 0 -120vmax;
+    background:repeating-conic-gradient(rgba(255,255,255,.38) 0 9deg,transparent 9deg 22deg);animation:spin 16s linear infinite;pointer-events:none}
+  #cele .big{position:relative;font-size:min(42vw,190px);line-height:1;animation:zoomin .8s cubic-bezier(.2,1.5,.4,1),wobble 1.6s ease-in-out .8s infinite;filter:drop-shadow(0 10px 18px rgba(0,0,0,.18))}
+  #cele h3{position:relative;margin:22px 0 10px;font-size:clamp(24px,7vw,34px);font-weight:800;color:#3b2a1a;animation:rise .6s .35s both}
+  #cele.gentle h3{color:#24452e}
+  #cele p{position:relative;margin:0 0 26px;font-size:clamp(15px,4.4vw,18px);color:#4d3f33;white-space:pre-wrap;line-height:1.7;animation:rise .6s .5s both}
+  #cele.gentle p{color:#2f4d37}
+  #cele button{position:relative;border:0;border-radius:999px;padding:13px 44px;font-size:17px;font-weight:700;color:#fff;background:#e0703f;box-shadow:0 6px 16px rgba(224,112,63,.4);animation:rise .6s .65s both}
+  #cele.gentle button{background:var(--green);box-shadow:0 6px 16px rgba(63,125,78,.35)}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes zoomin{0%{transform:scale(0) rotate(-200deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  @keyframes wobble{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.08) rotate(-6deg)}75%{transform:scale(1.08) rotate(6deg)}}
+  @keyframes rise{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:4px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+  /* 編輯照片 */
+  #mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+  #sheet{background:#fff;width:100%;max-width:640px;border-radius:18px 18px 0 0;padding:16px 16px 24px;max-height:92vh;overflow-y:auto}
+  #sheet img{width:100%;max-height:260px;object-fit:contain;border-radius:10px;background:#f2f2f2}
+
+  /* ====================== 貼紙風主題（和「今天動一下」同系列，薄荷綠） ====================== */
+  :root{
+    --bg:#f6f3ec; --card:#fff; --ink:#1f1f1f; --muted:#7c786e; --line:#1f1f1f;
+    --main:#6cc9a1; --main-soft:#dff4ea; --main-deep:#2f8a63;
+    --green:#2f8a63; --green-soft:#dff4ea;
+    --red:#e2685e; --pink-soft:#fde6e3; --blue:#3f86c9; --blue-soft:#e3f0fb;
+    --bd:2.5px solid var(--ink); --sh:4px 4px 0 var(--ink); --sh-s:3px 3px 0 var(--ink);
+  }
+  body{font-family:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;font-weight:500;
+    background-color:var(--bg);background-image:radial-gradient(rgba(31,31,31,.13) 1px,transparent 1.2px);background-size:14px 14px}
+  b,strong,h1,h2,h3{font-weight:900}
+
+  /* 頁首：標籤＋日期＋大標＋小人 */
+  header{position:static;background:none;color:var(--ink);padding:0}
+  .hero{max-width:640px;margin:0 auto;padding:18px 16px 4px;display:flex;align-items:flex-end;gap:10px}
+  .hero .txt{flex:1;min-width:0}
+  .pill-tag{display:inline-block;background:var(--main);border:var(--bd);border-radius:999px;padding:2px 12px;font-size:13px;font-weight:900;letter-spacing:.5px}
+  .hero .date{color:var(--muted);font-size:14px;margin:8px 0 2px}
+  .hero h1{margin:0;font-size:26px;font-weight:900;letter-spacing:1px;line-height:1.25}
+  .hero svg{width:78px;flex:none;animation:sway 3s ease-in-out infinite;transform-origin:50% 95%}
+  @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-2px)}}
+  nav{position:sticky;top:0;z-index:10;max-width:640px;margin:0 auto;padding:12px 16px 6px;gap:8px;
+    background:linear-gradient(var(--bg) 80%,transparent)}
+  nav button{flex:1;background:#fff;color:var(--ink);border:var(--bd);border-radius:14px;padding:9px 0;font:900 15px "Noto Sans TC",sans-serif;box-shadow:var(--sh-s);transition:transform .1s}
+  nav button.on{background:var(--main);color:var(--ink);border-bottom:var(--bd);box-shadow:var(--sh)}
+  nav button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  main{padding-top:8px}
+
+  /* 卡片 */
+  .card{border:var(--bd);border-radius:20px;box-shadow:var(--sh);padding:16px;margin-bottom:16px}
+  .card h2{font-size:16px;font-weight:900}
+  .card h4{color:var(--ink);font-weight:700}
+  .advice{background:#eaf7f0;border-color:var(--ink)}
+  .advice h2::before{content:"";}
+
+  /* 輸入框 */
+  input[type=date],input[type=time],input[type=number],input[type=text],textarea,select{
+    border:2px solid var(--ink);border-radius:14px;padding:10px 12px;font-family:inherit;font-weight:500}
+  input:focus,textarea:focus{outline:none;box-shadow:0 0 0 3px var(--main-soft)}
+  .nb{border:var(--bd);border-radius:14px;box-shadow:var(--sh-s);color:var(--ink);font-weight:900;background:#fff}
+
+  /* 選項按鈕（膠囊） */
+  .seg button,.chip{border:2px solid var(--ink);border-radius:999px;padding:7px 15px;font-weight:700;background:#fff;color:var(--ink)}
+  .seg button.on,.chip.on{background:var(--main);border-color:var(--ink);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+  .seg.red button.on{background:var(--red);color:#fff}
+  .seg.src button.on{background:#ff9f7a;color:var(--ink)}
+  .chip.blue{background:var(--blue-soft);border-color:var(--ink);color:var(--ink)}
+
+  /* 主要按鈕 */
+  .btn{border:var(--bd);border-radius:16px;background:var(--main);color:var(--ink);font-weight:900;font-size:16px;box-shadow:var(--sh);padding:12px 16px;transition:transform .1s}
+  .btn:active,.sm:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn.danger{background:#fff;color:var(--red);border:var(--bd)}
+  .sm{border:2px solid var(--ink);border-radius:12px;padding:6px 12px;font-weight:700;box-shadow:2px 2px 0 var(--ink);background:#fff}
+  .sm.ok{background:var(--main);color:var(--ink);border-color:var(--ink)}
+  .x{color:var(--muted);font-weight:700}
+  .upl{border:2.5px dashed var(--ink);border-radius:16px;background:#fff;color:var(--ink);font-weight:900}
+
+  /* 喝水 */
+  .stepper button{border:var(--bd);box-shadow:var(--sh-s);color:var(--ink);font-weight:900;background:var(--blue-soft)}
+  .stepper .n{color:var(--ink);font-weight:900}
+  .total{background:var(--blue-soft);color:var(--ink);border:2px solid var(--ink);border-radius:14px;font-weight:700}
+
+  /* 照片 */
+  .ph{border:2px solid var(--ink);border-radius:14px}
+  .ph .tag{background:var(--ink);font-weight:700}
+  .ph .src{border:1.5px solid var(--ink);font-weight:700}
+  .pend{border:var(--bd);border-radius:16px;background:var(--main-soft);box-shadow:var(--sh-s)}
+  .warn{background:#fff;border:2px solid var(--ink)}
+  .warn button{background:var(--main);border:2px solid var(--ink);font-weight:700}
+
+  /* 本週摘要、趨勢 */
+  .stat{background:#fff;border:2px solid var(--ink);border-radius:16px;text-align:center}
+  .stat b{font-size:24px;font-weight:900}
+  th{color:var(--ink);font-weight:900;border-bottom:2px solid var(--ink)}
+  .badge{background:var(--main);color:var(--ink);border:1.5px solid var(--ink);font-weight:900}
+  .rx.cur{background:var(--main-soft);border-radius:14px}
+  .pinfo{background:var(--pink-soft);border:2px solid var(--ink);color:var(--ink);font-weight:700}
+  .down{color:var(--main-deep);font-weight:900} .up{color:var(--red);font-weight:900}
+
+  /* 加油橫幅 */
+  .cheer{background:#fff;border:var(--bd);border-radius:20px;box-shadow:var(--sh)}
+  .cheer .streak{color:var(--red)}
+
+  /* 全螢幕動畫：不用黃色 */
+  #cele.party{background:radial-gradient(circle at 50% 42%,rgba(240,255,248,.97),rgba(150,224,192,.94) 55%,rgba(255,170,160,.93))}
+  #cele.gentle{background:radial-gradient(circle at 50% 42%,rgba(246,250,255,.97),rgba(200,230,250,.94) 60%,rgba(170,215,200,.93))}
+  #cele h3,#cele.gentle h3{color:var(--ink);font-weight:900}
+  #cele p,#cele.gentle p{color:var(--ink)}
+  #cele button,#cele.gentle button{background:var(--main);color:var(--ink);border:var(--bd);box-shadow:var(--sh)}
+
+  /* 放大看照片 */
+  #lb{position:fixed;inset:0;z-index:70;background:rgba(20,20,20,.98);display:flex;flex-direction:column;touch-action:pan-y;animation:fadein .2s}
+  #lb .top{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;color:#fff;font-weight:700;font-size:14px}
+  #lb .top button{width:40px;height:40px;border-radius:50%;border:2px solid #fff;background:transparent;color:#fff;font-size:20px;font-weight:900}
+  #lb .stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #lb .stage img{max-width:100%;max-height:100%;object-fit:contain;transition:filter .3s,transform .25s;transform-origin:center}
+  #lb .stage img.blur{filter:blur(6px)}
+  #lb .nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:2.5px solid var(--ink);
+    background:#fff;color:var(--ink);font-size:22px;font-weight:900;box-shadow:3px 3px 0 var(--ink)}
+  #lb .nav.l{left:10px} #lb .nav.r{right:10px}
+  #lb .cap2{padding:12px 16px calc(14px + env(safe-area-inset-bottom));color:#fff;font-size:14px;line-height:1.6}
+  #lb .cap2 .chipd{display:inline-block;background:#fff;color:var(--ink);border-radius:999px;padding:1px 10px;font-weight:900;font-size:13px;margin-right:6px}
+  #lb .cap2 a{color:#bfe9d6}
+  #lb .ld{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.9);color:var(--ink);border-radius:999px;padding:2px 12px;font-size:12px;font-weight:700}
+  /* 編輯照片面板 */
+  #sheet{border:var(--bd);border-bottom:0;border-radius:24px 24px 0 0}
+  #status{background:var(--ink);border-radius:999px;font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <div class="txt">
+      <span class="pill-tag">TODAY'S MEALS</span>
+      <div class="date" id="heroDate"></div>
+      <h1>減重飲食紀錄</h1>
+    </div>
+    <!-- 拿著碗的小人 -->
+    <svg viewBox="0 0 80 120" aria-hidden="true">
+      <ellipse cx="40" cy="114" rx="26" ry="4" fill="#1f1f1f" opacity=".12"/>
+      <g stroke="#1f1f1f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M33 78 L31 108 M47 78 L49 108" fill="none" stroke-width="7"/>
+        <path d="M33 78 L31 108 M47 78 L49 108" fill="none" stroke="#5b6375" stroke-width="3.5"/>
+        <ellipse cx="29" cy="110" rx="6" ry="3.2" fill="#fff"/><ellipse cx="51" cy="110" rx="6" ry="3.2" fill="#fff"/>
+        <path d="M27 44 Q40 38 53 44 L55 80 Q40 84 25 80 Z" fill="#6cc9a1"/>
+        <path d="M27 48 Q20 60 30 66 M53 48 Q60 60 50 66" fill="none"/>
+        <path d="M24 64 Q40 76 56 64 Z" fill="#fff"/>
+        <path d="M30 63 Q40 56 50 63" fill="none" stroke="#e2685e" stroke-width="2"/>
+        <circle cx="40" cy="26" r="11" fill="#fbe3d6"/>
+        <path d="M29 24 Q30 13 40 13 Q50 13 51 24 Q46 18 40 19 Q33 19 29 24 Z" fill="#3a3a3a"/>
+        <circle cx="40" cy="10" r="4.5" fill="#3a3a3a"/>
+        <circle cx="36" cy="27" r="1" fill="#1f1f1f"/><circle cx="44" cy="27" r="1" fill="#1f1f1f"/>
+        <path d="M37.5 31.5 Q40 33.5 42.5 31.5" fill="none" stroke-width="1.8"/>
+      </g>
+    </svg>
+  </div>
+  <nav>
+    <button data-tab="today" class="on">今天</button>
+    <button data-tab="week">本週摘要</button>
+    <button data-tab="visit">回診</button>
+    <button data-tab="trend">趨勢</button>
+  </nav>
+</header>
+
+<main>
+<!-- ================= 今天 ================= -->
+<section id="tab-today" class="on">
+  <div class="datebar">
+    <button class="nb" onclick="shiftDay(-1)">‹</button>
+    <input type="date" id="date" onchange="loadDay(this.value)">
+    <button class="nb" onclick="shiftDay(1)">›</button>
+  </div>
+
+  <div class="cheer hidden" id="cheer">
+    <div class="em" id="cheerEm"></div>
+    <div class="msg"><div id="cheerMsg"></div><div class="streak" id="cheerStreak"></div></div>
+  </div>
+
+  <div class="card advice hidden" id="adviceCard">
+    <h2>💬 醫師上次建議 <span class="muted" id="adviceDate"></span></h2>
+    <p id="adviceText"></p>
+  </div>
+
+  <div class="card">
+    <h2>📷 吃了什麼</h2>
+
+    <!-- 選好照片後出現：確認用餐時間、餐別 -->
+    <div class="pend hidden" id="pend">
+      <div class="prev" id="pendPrev"></div>
+      <div class="row" style="flex-wrap:nowrap">
+        <div style="flex:1"><label class="f">用餐時間</label><input type="time" id="pendTime"></div>
+        <div style="flex:1"><label class="f">日期</label><input type="date" id="pendDate"></div>
+      </div>
+      <div class="warn hidden" id="pendWarn"><span id="pendWarnText"></span><button id="pendWarnBtn">改到那天</button></div>
+      <label class="f">餐別</label>
+      <div class="seg" id="pendMeal"></div>
+      <label class="f">來源</label>
+      <div class="seg src" id="pendSrc"></div>
+      <label class="f">備註（選填，例如：吃一半、店名）</label>
+      <input type="text" id="pendNote">
+      <div class="btns">
+        <button class="btn ghost" onclick="cancelPend()">取消</button>
+        <button class="btn" id="pendGo" onclick="doUpload()">上傳</button>
+      </div>
+    </div>
+
+    <label class="upl" for="fileIn" id="uplLabel">＋ 拍照或選照片</label>
+    <input type="file" id="fileIn" accept="image/*" multiple class="hidden">
+    <div style="height:10px"></div>
+    <div class="grid" id="foodGrid"></div>
+    <p class="muted hidden" id="noFood">今天還沒有照片</p>
+    <p class="muted" style="margin:8px 0 0">點照片可以修改用餐時間、餐別或刪除</p>
+  </div>
+
+  <div class="card">
+    <h2>💊 服藥</h2>
+    <p class="muted" style="margin:-4px 0 8px" id="rxNow"></p>
+    <div class="seg" id="medSeg"></div>
+  </div>
+
+  <div class="card">
+    <h2>💧 喝水</h2>
+    <h4 id="bottleLabel">水壺</h4>
+    <div class="stepper">
+      <button onclick="addBottle(-0.5)">−</button>
+      <span class="n" id="bottleN">0</span>
+      <button onclick="addBottle(0.5)">＋</button>
+      <span class="muted" id="bottleMl"></span>
+    </div>
+    <h4>其他（超商無糖茶、瓶裝水…）</h4>
+    <div class="seg" style="margin-bottom:8px">
+      <button class="chip blue" onclick="addOther(300)">+300</button>
+      <button class="chip blue" onclick="addOther(500)">+500</button>
+      <button class="chip blue" onclick="addOther(600)">+600</button>
+      <button class="chip blue" onclick="addOther(975)">+975</button>
+    </div>
+    <div class="row" style="flex-wrap:nowrap">
+      <input type="number" id="otherMl" inputmode="numeric" min="0" step="10" placeholder="直接輸入合計">
+      <span class="muted" style="flex:none">ml</span>
+      <button class="x" style="flex:none" onclick="setOther(0)">清除</button>
+    </div>
+    <div class="total"><span>今天總共</span><b id="totalMl">0 ml</b></div>
+  </div>
+
+  <div class="card">
+    <h2>🚽 排便</h2>
+    <div class="seg" data-key="poop" data-opts="無,有"></div>
+    <div id="poopTypeBox" class="hidden">
+      <label class="f">狀況</label>
+      <div class="seg" data-key="poopType" data-opts="順暢,偏硬,偏軟,腹瀉"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>😴 睡眠</h2>
+    <p class="muted" style="margin:-4px 0 8px">填「昨晚睡到今天早上」，早上起床就能填</p>
+    <label class="f">入睡時間</label>
+    <input type="time" id="bedTime" style="width:150px">
+    <label class="f">睡了多久</label>
+    <div class="row">
+      <input type="number" id="sleepH" min="0" max="24" inputmode="numeric" placeholder="7" style="width:80px">
+      <span class="muted">小時</span>
+      <input type="number" id="sleepM" min="0" max="59" step="5" inputmode="numeric" placeholder="30" style="width:80px">
+      <span class="muted">分鐘</span>
+    </div>
+    <div class="total hidden" id="wakeBox"><span>起床時間</span><b id="wakeTime"></b></div>
+    <label class="f">品質</label>
+    <div class="seg" data-key="sleepQ" data-opts="好,普通,差"></div>
+  </div>
+
+  <div class="card">
+    <h2>🚶 活動</h2>
+    <label class="f">今天的步數（晚上填，看手機健康 App，大概就好）</label>
+    <input type="number" id="steps" inputmode="numeric" placeholder="例如 6500">
+    <label class="f">運動（選填）</label>
+    <input type="text" id="exercise" placeholder="例如：快走 30 分鐘">
+  </div>
+
+  <div class="card">
+    <h2>🩸 經期・今天的量</h2>
+    <div class="seg red" data-key="period" data-opts="無,點狀,少,中,多"></div>
+    <div class="pinfo hidden" id="pInfo"></div>
+    <div id="pHist"></div>
+  </div>
+
+  <div class="card">
+    <h2>📝 備註</h2>
+    <textarea id="note" placeholder="身體狀況，例如：水腫、口乾、頻尿、特別餓…"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>❓ 想問醫師</h2>
+    <div class="row" style="flex-wrap:nowrap">
+      <input type="text" id="qQuick" placeholder="想到就記，例如：藥要吃多久？">
+      <button class="sm ok" onclick="addQ('qQuick')">加入</button>
+    </div>
+    <p class="muted" style="margin:6px 0 0" id="qCount"></p>
+  </div>
+
+  <p class="muted" style="text-align:center" id="savedAt"></p>
+</section>
+
+<!-- ================= 本週摘要 ================= -->
+<section id="tab-week">
+  <div class="datebar">
+    <button class="nb" onclick="shiftWeek(-7)">‹</button>
+    <div style="flex:1;text-align:center;font-weight:600" id="weekLabel"></div>
+    <button class="nb" onclick="shiftWeek(7)">›</button>
+  </div>
+  <div id="weekBody"><p class="muted">載入中…</p></div>
+</section>
+
+<!-- ================= 趨勢 ================= -->
+<section id="tab-trend">
+  <div class="seg" id="trendRange" style="margin-bottom:12px">
+    <button data-n="8">近 8 週</button><button data-n="12" class="on">近 12 週</button>
+    <button data-n="26">近半年</button><button data-n="0">全部</button>
+  </div>
+  <div id="trendBody"><p class="muted">載入中…</p></div>
+</section>
+
+<!-- ================= 回診 ================= -->
+<section id="tab-visit">
+  <div class="card">
+    <h2>❓ 回診要問的問題</h2>
+    <div id="qList"></div>
+    <div class="row" style="flex-wrap:nowrap;margin-top:8px">
+      <input type="text" id="qNew" placeholder="新增問題">
+      <button class="sm ok" onclick="addQ('qNew')">加入</button>
+    </div>
+    <div id="qDone"></div>
+  </div>
+
+  <div class="card">
+    <h2>🏥 新增回診紀錄</h2>
+    <label class="f">日期</label>
+    <input type="date" id="vDate">
+    <div class="row" style="flex-wrap:nowrap">
+      <div style="flex:1"><label class="f">體重 (kg)</label><input type="number" id="vWeight" step="0.1" inputmode="decimal"></div>
+      <div style="flex:1"><label class="f">體脂 (%)</label><input type="number" id="vFat" step="0.1" inputmode="decimal"></div>
+    </div>
+    <label class="f">醫師建議</label>
+    <textarea id="vAdvice" placeholder="例如：晚餐減少澱粉、多喝水…"></textarea>
+    <div style="height:10px"></div>
+    <button class="btn" onclick="saveVisit()">儲存</button>
+  </div>
+  <div class="card">
+    <h2>📈 趨勢</h2>
+    <div id="vCharts"></div>
+  </div>
+  <div class="card">
+    <h2>📋 歷次紀錄</h2>
+    <div id="vList"></div>
+  </div>
+
+  <div class="card">
+    <h2>💊 處方紀錄</h2>
+    <div id="rxList"></div>
+    <details id="rxFormBox" style="margin-top:6px">
+      <summary id="rxFormTitle">＋ 醫師換藥了？新增處方</summary>
+      <div class="row" style="flex-wrap:nowrap">
+        <div style="flex:1"><label class="f">開始日期</label><input type="date" id="rxStart"></div>
+        <div style="flex:1"><label class="f">結束日期（選填）</label><input type="date" id="rxEnd"></div>
+      </div>
+      <label class="f">處方內容</label>
+      <textarea id="rxContent" placeholder="例如：藥名與劑量（照收據上抄）"></textarea>
+      <label class="f">服藥時段</label>
+      <div class="seg" id="rxDoses"></div>
+      <label class="f">備註（選填）</label>
+      <input type="text" id="rxNote" placeholder="例如：飯後">
+      <label class="f">處方簽照片（選填，可多張）</label>
+      <label class="upl" for="rxFile" style="padding:10px">📷 拍處方簽或選照片</label>
+      <input type="file" id="rxFile" accept="image/*" multiple class="hidden">
+      <div class="prev" id="rxPrev" style="display:flex;gap:6px;overflow-x:auto;margin-top:8px"></div>
+      <div class="btns">
+        <button class="btn ghost" onclick="resetRxForm()">取消</button>
+        <button class="btn" onclick="saveRx()">儲存處方</button>
+      </div>
+      <p class="muted" style="margin:8px 0 0">新增處方時，上一張處方會自動結束在前一天。</p>
+    </details>
+  </div>
+  <p class="muted" style="text-align:center"><a id="sheetLink" target="_blank">開啟試算表</a>　·　<a href="javascript:void(0)" onclick="if(confirm('清除這台裝置記住的通行碼？'))resetKey()">重設通行碼</a></p>
+</section>
+</main>
+
+<!-- 編輯照片 -->
+<div id="mask" class="hidden" onclick="if(event.target===this)closeEdit()">
+  <div id="sheet">
+    <img id="eImg" onclick="openLb('today', EDIT && EDIT.id)" style="cursor:zoom-in">
+    <p style="text-align:center;margin:6px 0 0"><a href="javascript:void(0)" onclick="openLb('today', EDIT && EDIT.id)">🔍 放大看</a></p>
+    <div class="row" style="flex-wrap:nowrap">
+      <div style="flex:1"><label class="f">用餐時間</label><input type="time" id="eTime"></div>
+      <div style="flex:1"><label class="f">日期</label><input type="date" id="eDate"></div>
+    </div>
+    <label class="f">餐別</label>
+    <div class="seg" id="eMeal"></div>
+    <label class="f">來源</label>
+    <div class="seg src" id="eSrc"></div>
+    <label class="f">備註</label>
+    <input type="text" id="eNote">
+    <div class="btns">
+      <button class="btn danger" onclick="delFood()">刪除</button>
+      <button class="btn ghost" onclick="closeEdit()">取消</button>
+      <button class="btn" onclick="saveEdit()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div id="status"></div>
+<div id="cele" class="hidden" onclick="closeCele()">
+  <div class="rays"></div>
+  <div class="big" id="celeEm"></div>
+  <h3 id="celeTitle"></h3>
+  <p id="celeText"></p>
+  <button onclick="closeCele()">好！</button>
+</div>
+<canvas id="fx"></canvas>
+<div id="lb" class="hidden">
+  <div class="top"><span id="lbCount"></span><button onclick="closeLb()" aria-label="關閉">×</button></div>
+  <div class="stage" id="lbStage">
+    <img id="lbImg" alt="">
+    <button class="nav l" id="lbPrev" onclick="lbGo(-1)">‹</button>
+    <button class="nav r" id="lbNext" onclick="lbGo(1)">›</button>
+    <span class="ld hidden" id="lbLoad">載入原圖中…</span>
+  </div>
+  <div class="cap2" id="lbCap"></div>
+</div>
+
+<script>
+/* ---------- 共用 ---------- */
+let INIT = null, CUR = '', D = {}, FOODS = [], VISITS = [], WEEK_START = '';
+let PEND = null, EDIT = null, saveTimer = null, dirty = false;
+let RX = [], QS = [], RX_EDIT = null, LAST_SRC = '';
+let HIST = { logged: [], periods: [] }, periodDirty = false;
+const FLOW_LV = { '點狀': 1, '少': 2, '中': 3, '多': 4, '經期中': 2 };
+try { LAST_SRC = localStorage.getItem('lastSrc') || ''; } catch (e) {}
+const WD = ['日','一','二','三','四','五','六'];
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const fmt = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const hm = d => pad(d.getHours()) + ':' + pad(d.getMinutes());
+const addDays = (s, n) => { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return fmt(d); };
+const md = s => { const d = new Date(s + 'T00:00:00'); return (d.getMonth() + 1) + '/' + d.getDate() + '（' + WD[d.getDay()] + '）'; };
+const mdShort = s => { const d = new Date(s + 'T00:00:00'); return (d.getMonth() + 1) + '/' + d.getDate(); };
+const n1 = x => Math.round(x * 10) / 10;
+/** 睡眠：小時（小數）→「7 小時 30 分」/「7h30m」 */
+const hmText = h => { const m = Math.round(Number(h) * 60); return Math.floor(m / 60) + ' 小時' + (m % 60 ? ' ' + (m % 60) + ' 分' : ''); };
+/** 入睡時間 + 睡眠時數 → 起床時間（跨午夜自動處理） */
+function calcWake(bed, hours) {
+  if (!bed || !Number(hours)) return '';
+  const [h, m] = bed.split(':').map(Number), t = (h * 60 + m + Math.round(Number(hours) * 60)) % 1440;
+  return pad(Math.floor(t / 60)) + ':' + pad(t % 60);
+}
+function paintWake() {
+  const w = calcWake(D.bedTime, D.sleep);
+  $('wakeBox').classList.toggle('hidden', !w);
+  $('wakeTime').textContent = w;
+}
+const hmShort = h => { const m = Math.round(Number(h) * 60); return Math.floor(m / 60) + 'h' + (m % 60 ? pad(m % 60) + 'm' : ''); };
+
+function toast(msg, ms) {
+  const el = $('status'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), ms || 1600);
+}
+/* ★ Apps Script 部署網址（網頁應用程式的 /exec 網址） */
+const API_URL = "https://script.google.com/macros/s/AKfycbxkEKHy3W_4NNCGemHfK-i2hHqijgnBsn0fR1Qp_etNjwRj0mU48UE-Y31x7Q9K1_S5DQ/exec";
+const KEY_LS = 'diet-api-key';
+let keyAsk = null;
+function getKey() {
+  let k = '';
+  try { k = localStorage.getItem(KEY_LS) || ''; } catch (e) {}
+  if (k) return Promise.resolve(k);
+  if (!keyAsk) keyAsk = new Promise((res, rej) => {
+    const v = (prompt('請輸入通行碼（這台裝置第一次使用時需要）') || '').trim();
+    keyAsk = null;
+    if (!v) return rej(new Error('未輸入通行碼'));
+    try { localStorage.setItem(KEY_LS, v); } catch (e) {}
+    res(v);
+  });
+  return keyAsk;
+}
+function resetKey() { try { localStorage.removeItem(KEY_LS); } catch (e) {} location.reload(); }
+async function run(fn, ...args) {
+  try {
+    const key = await getKey();
+    let r;
+    try { r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args, key }) }); }
+    catch (e) { throw new Error('無法連到雲端（請檢查網路，或 Apps Script 存取權是否設為「任何人」）'); }
+    let j;
+    try { j = await r.json(); } catch (e) { throw new Error('雲端回應格式錯誤，請確認 Apps Script 已部署最新版本'); }
+    if (!j.ok) {
+      if (/通行碼/.test(j.error || '')) { try { localStorage.removeItem(KEY_LS); } catch (e) {} }
+      throw new Error(j.error || '未知錯誤');
+    }
+    return j.data;
+  } catch (e) { toast('錯誤：' + (e.message || e), 4000); throw e; }
+}
+
+/** 依用餐時間推測餐別 */
+function mealOf(time) {
+  if (!time) return '點心';
+  const [h, m] = time.split(':').map(Number), t = h + m / 60;
+  return t < 5 ? '宵夜' : t < 10.5 ? '早餐' : t < 14.5 ? '午餐' : t < 17 ? '點心' : t < 21 ? '晚餐' : '宵夜';
+}
+function mealSeg(el, cur, onPick) {
+  el.innerHTML = INIT.meals.map(m => `<button class="${m === cur ? 'on' : ''}" data-v="${m}">${m}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => {
+    el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    onPick(b.dataset.v);
+  });
+}
+
+/** 來源（自煮／外食／超商），再按一次可取消 */
+function srcSeg(el, cur, onPick) {
+  el.innerHTML = INIT.sources.map(s => `<button class="${s === cur ? 'on' : ''}" data-v="${s}">${s}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => {
+    const on = !b.classList.contains('on');
+    el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b && on));
+    onPick(on ? b.dataset.v : '');
+  });
+}
+
+/** 某天適用的處方 / 服藥時段 */
+function rxFor(date) {
+  let hit = null;
+  RX.forEach(r => { if (r.start <= date && (!r.end || r.end >= date)) hit = r; });
+  return hit;
+}
+function planFor(date) {
+  const r = rxFor(date);
+  return r && r.doses ? r.doses.split(',').filter(Boolean) : INIT.defaultDoses;
+}
+
+/* ---------- 分頁 ---------- */
+document.querySelectorAll('nav button').forEach(b => b.onclick = async () => {
+  await flushSave();
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === 'tab-' + b.dataset.tab));
+  if (b.dataset.tab === 'week') loadWeek();
+  if (b.dataset.tab === 'visit') renderVisits();
+  if (b.dataset.tab === 'trend') loadTrends();
+  window.scrollTo(0, 0);
+});
+
+/* ---------- 每日欄位 ---------- */
+function buildSegs() {
+  document.querySelectorAll('.seg[data-key]').forEach(seg => {
+    seg.innerHTML = seg.dataset.opts.split(',').map(o => `<button data-v="${o}">${o}</button>`).join('');
+    seg.querySelectorAll('button').forEach(b => b.onclick = () => {
+      const k = seg.dataset.key;
+      D[k] = D[k] === b.dataset.v ? '' : b.dataset.v;   // 再按一次取消
+      if (k === 'poop' && D.poop !== '有') D.poopType = '';
+      if (k === 'period') periodDirty = true;
+      paint(); changed();
+    });
+  });
+  ['steps', 'exercise', 'note'].forEach(id => $(id).addEventListener('input', () => { D[id] = $(id).value; changed(); }));
+  ['sleepH', 'sleepM', 'bedTime'].forEach(id => $(id).addEventListener('input', () => {
+    const h = $('sleepH').value, m = $('sleepM').value;
+    D.sleep = (h === '' && m === '') ? '' : Math.round(((Number(h) || 0) + Math.min(59, Number(m) || 0) / 60) * 1000) / 1000;
+    D.bedTime = $('bedTime').value;
+    D.wakeTime = calcWake(D.bedTime, D.sleep);
+    paintWake(); changed();
+  }));
+  $('otherMl').addEventListener('input', () => { D.otherMl = $('otherMl').value; paintWater(); changed(); });
+  $('bottleLabel').textContent = '水壺（一瓶 ' + INIT.bottleMl + ' ml）';
+}
+
+/** 依當天處方建立服藥按鈕 */
+function buildMedSeg(date) {
+  const plan = planFor(date), r = rxFor(date);
+  D.medPlan = plan.join(',');
+  $('rxNow').textContent = r ? '目前處方：' + r.content : '尚未登記處方（到「回診」分頁新增）';
+  $('medSeg').innerHTML = plan.map(m => `<button class="chip" data-v="${m}">${m}</button>`).join('');
+  $('medSeg').querySelectorAll('button').forEach(b => b.onclick = () => {
+    const set = new Set((D.meds || '').split(',').filter(Boolean));
+    set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v);
+    D.meds = plan.filter(x => set.has(x)).join(',');
+    paint(); changed();
+  });
+}
+
+function paint() {
+  document.querySelectorAll('.seg[data-key]').forEach(seg => {
+    seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', D[seg.dataset.key] === b.dataset.v));
+  });
+  const meds = (D.meds || '').split(',');
+  $('medSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', meds.includes(b.dataset.v)));
+  $('poopTypeBox').classList.toggle('hidden', D.poop !== '有');
+  paintWater();
+}
+function paintWater() {
+  const b = Number(D.water) || 0, o = Number(D.otherMl) || 0;
+  $('bottleN').textContent = b;
+  $('bottleMl').textContent = '瓶 = ' + Math.round(b * INIT.bottleMl) + ' ml';
+  if (document.activeElement !== $('otherMl')) $('otherMl').value = o || '';
+  $('totalMl').textContent = Math.round(b * INIT.bottleMl + o).toLocaleString() + ' ml';
+}
+function addBottle(n) { D.water = Math.max(0, n1((Number(D.water) || 0) + n)); paintWater(); changed(); }
+function addOther(ml) { setOther((Number(D.otherMl) || 0) + ml); }
+function setOther(ml) { D.otherMl = Math.max(0, ml); $('otherMl').value = D.otherMl || ''; paintWater(); changed(); }
+
+/* ---------- 自動儲存 ---------- */
+function changed() {
+  dirty = true;
+  $('savedAt').textContent = '儲存中…';
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, 900);
+}
+async function flushSave() {
+  clearTimeout(saveTimer);
+  if (!dirty) return;
+  dirty = false;
+  const date = D.date;
+  const t = await run('saveDaily', Object.assign({}, D));
+  $('savedAt').textContent = '已自動儲存 ' + t.slice(11);
+  if (!HIST.logged.includes(date)) { HIST.logged.push(date); HIST.logged.sort(); }
+  if (periodDirty) { periodDirty = false; HIST = await run('getHistory'); }
+  renderPeriod(); renderCheer(); checkComplete();
+}
+
+/* ---------- 讀取某一天 ---------- */
+function shiftDay(n) { loadDay(addDays(CUR, n)); }
+async function loadDay(date) {
+  if (!INIT) return;                     // 初始資料還沒好之前不讀
+  await flushSave();
+  CUR = date; $('date').value = date;
+  $('foodGrid').innerHTML = '<p class="muted">載入中…</p>';
+  let r;
+  try { r = await run('getDay', date); }
+  catch (e) { $('foodGrid').innerHTML = '<p class="muted" style="color:#e2685e">讀取失敗：' + esc(e.message || e) + '</p>'; return; }
+  if (CUR !== date) return;
+  if (!r) { $('foodGrid').innerHTML = '<p class="muted" style="color:#e2685e">讀取失敗：伺服器沒有回傳資料，請重新整理</p>'; return; }
+  D = r.daily || { date: date };
+  D.date = date;
+  ['steps', 'exercise', 'note'].forEach(id => $(id).value = D[id] == null ? '' : D[id]);
+  const sm = Math.round((Number(D.sleep) || 0) * 60);
+  $('sleepH').value = D.sleep === '' || D.sleep == null ? '' : Math.floor(sm / 60);
+  $('sleepM').value = D.sleep === '' || D.sleep == null ? '' : sm % 60;
+  $('bedTime').value = D.bedTime || '';
+  paintWake();
+  $('otherMl').value = D.otherMl || '';
+  buildMedSeg(date);
+  FOODS = r.foods;
+  $('savedAt').textContent = r.daily && r.daily.updated ? '上次儲存 ' + r.daily.updated : '';
+  paint(); renderFoods(); renderPeriod(); renderCheer();
+}
+
+function sortFoods() { FOODS.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)); }
+function renderFoods() {
+  $('noFood').classList.toggle('hidden', FOODS.length > 0);
+  $('foodGrid').innerHTML = FOODS.map(f => photoHtml(f, `openEdit('${esc(f.id)}')`)).join('');
+}
+function photoHtml(f, onclick) {
+  return `<div class="ph" onclick="${onclick}">
+      <img src="${esc(f.thumb)}" loading="lazy">
+      <span class="tag">${esc(f.meal)} ${esc(f.time)}</span>
+      ${f.source ? `<span class="src">${esc(f.source)}</span>` : ''}
+      ${f.note ? `<div class="cap">${esc(f.note)}</div>` : ''}
+    </div>`;
+}
+
+/* ---------- 選照片 → 確認時間 → 上傳 ---------- */
+function loadImg(file) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => { URL.revokeObjectURL(url); res(img); };
+    img.onerror = rej; img.src = url;
+  });
+}
+function toJpeg(img, max, q) {
+  const s = Math.min(1, max / Math.max(img.width, img.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', q);
+}
+
+$('fileIn').onchange = async e => {
+  const files = Array.from(e.target.files); e.target.value = '';
+  if (!files.length) return;
+  // 用照片的拍攝(修改)時間當預設用餐時間；抓不到就用現在
+  const shot = files[0].lastModified ? new Date(files[0].lastModified) : new Date();
+  const time = hm(shot);
+  PEND = { files, imgs: [], date: CUR, time, meal: mealOf(time), mealManual: false, shotDate: fmt(shot), source: LAST_SRC };
+  $('pendPrev').innerHTML = '<span class="muted">處理照片中…</span>';
+  $('pendTime').value = time; $('pendDate').value = CUR; $('pendNote').value = '';
+  paintPendMeal(); checkPendDate();
+  srcSeg($('pendSrc'), PEND.source, s => PEND.source = s);
+  $('pend').classList.remove('hidden'); $('uplLabel').classList.add('hidden');
+  for (const f of files) { try { PEND.imgs.push(await loadImg(f)); } catch (err) { PEND.imgs.push(null); } }
+  $('pendPrev').innerHTML = PEND.imgs.filter(Boolean).map(i => `<img src="${toJpeg(i, 160, 0.6)}">`).join('');
+};
+function paintPendMeal() { mealSeg($('pendMeal'), PEND.meal, m => { PEND.meal = m; PEND.mealManual = true; }); }
+function checkPendDate() {
+  const show = PEND.shotDate !== $('pendDate').value;
+  $('pendWarn').classList.toggle('hidden', !show);
+  if (show) {
+    $('pendWarnText').textContent = '這張照片是 ' + md(PEND.shotDate) + ' 拍的';
+    $('pendWarnBtn').onclick = () => { $('pendDate').value = PEND.shotDate; checkPendDate(); };
+  }
+}
+$('pendTime').addEventListener('input', () => {
+  if (!PEND) return;
+  if (!PEND.mealManual) { PEND.meal = mealOf($('pendTime').value); paintPendMeal(); }
+});
+$('pendDate').addEventListener('input', () => PEND && checkPendDate());
+function cancelPend() { PEND = null; $('pend').classList.add('hidden'); $('uplLabel').classList.remove('hidden'); }
+
+async function doUpload() {
+  if (!PEND) return;
+  const p = PEND, date = $('pendDate').value || CUR, time = $('pendTime').value || hm(new Date());
+  const note = $('pendNote').value.trim();
+  $('pendGo').disabled = true;
+  LAST_SRC = p.source || '';
+  try { localStorage.setItem('lastSrc', LAST_SRC); } catch (e) {}
+  let ok = 0;
+  for (let i = 0; i < p.imgs.length; i++) {
+    $('pendGo').textContent = `上傳中 ${i + 1}/${p.imgs.length}…`;
+    const img = p.imgs[i];
+    if (!img) continue;
+    try {
+      const full = toJpeg(img, 1600, 0.82);
+      let thumb = toJpeg(img, 320, 0.6);
+      if (thumb.length > 45000) thumb = toJpeg(img, 220, 0.5);     // 試算表單格上限 5 萬字
+      const rec = await run('uploadFood', { date, time, meal: p.meal, source: p.source || '', note, full, thumb });
+      if (rec.date === CUR) { FOODS.push(rec); sortFoods(); renderFoods(); }
+      ok++;
+    } catch (err) { toast('第 ' + (i + 1) + ' 張上傳失敗', 3000); }
+  }
+  $('pendGo').disabled = false; $('pendGo').textContent = '上傳';
+  cancelPend();
+  toast(date === CUR ? `已上傳 ${ok} 張` : `已上傳 ${ok} 張到 ${mdShort(date)}`);
+  checkComplete();
+}
+
+/* ---------- 編輯照片 ---------- */
+function openEdit(id) {
+  const f = FOODS.find(x => x.id === id); if (!f) return;
+  EDIT = Object.assign({}, f);
+  $('eImg').src = f.thumb; if ($('eLink')) $('eLink').href = f.url;
+  $('eTime').value = f.time; $('eDate').value = f.date; $('eNote').value = f.note || '';
+  mealSeg($('eMeal'), f.meal, m => EDIT.meal = m);
+  srcSeg($('eSrc'), f.source || '', s => EDIT.source = s);
+  $('mask').classList.remove('hidden');
+}
+function closeEdit() { EDIT = null; $('mask').classList.add('hidden'); }
+async function saveEdit() {
+  const p = { id: EDIT.id, date: $('eDate').value || EDIT.date, time: $('eTime').value || EDIT.time, meal: EDIT.meal, source: EDIT.source || '', note: $('eNote').value.trim() };
+  const rec = await run('updateFood', p);
+  FOODS = FOODS.filter(f => f.id !== p.id);
+  if (rec.date === CUR) FOODS.push(rec);
+  sortFoods(); renderFoods(); closeEdit(); toast('已更新');
+}
+async function delFood() {
+  if (!confirm('刪除這張照片？')) return;
+  const id = EDIT.id;
+  await run('deleteFood', id);
+  FOODS = FOODS.filter(f => f.id !== id); renderFoods(); closeEdit(); toast('已刪除');
+}
+
+/* ---------- 本週摘要 ---------- */
+const totalOf = d => (Number(d.water) || 0) * INIT.bottleMl + (Number(d.otherMl) || 0);
+/** 每週三回診：摘要範圍為「週三～下週二」。
+ *  回診當天（週三）預設顯示剛結束的那一週（上週三～昨天），其他天顯示這週三起算的這一週 */
+const VISIT_DAY = 3;   // 0=日 1=一 2=二 3=三 …
+function visitWeekStart(today) {
+  const wd = new Date(today + 'T00:00:00').getDay();
+  const back = (wd - VISIT_DAY + 7) % 7;
+  return addDays(today, back === 0 ? -7 : -back);
+}
+function shiftWeek(n) { WEEK_START = addDays(WEEK_START, n); loadWeek(); }
+async function loadWeek() {
+  const start = WEEK_START;
+  const nextVisit = addDays(start, 7);
+  $('weekLabel').innerHTML = md(start) + ' – ' + md(addDays(start, 6)) +
+    `<div class="muted" style="font-weight:400">${nextVisit === INIT.today ? '今天回診要看的這一週' : mdShort(nextVisit) + '（三）回診'}</div>`;
+  $('weekBody').innerHTML = '<p class="muted">載入中…</p>';
+  const w = await run('getWeek', start);
+  if (start !== WEEK_START) return;
+  VISITS = w.visits; RX = w.rx; QS = w.questions; HIST = w.history;
+  WEEK_FOODS = w.foods;
+  setTimeout(() => prefetchWeek(WEEK_FOODS), 300);
+  const days = w.dates.map(d => w.daily[d] || { date: d });
+  const filled = days.filter(d => d.updated);
+  const avgOf = arr => { const v = arr.filter(x => x > 0); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const planLen = d => (d.medPlan ? String(d.medPlan).split(',').filter(Boolean) : planFor(d.date)).length;
+  const medTotal = filled.reduce((a, d) => a + planLen(d), 0);
+  const medTaken = days.reduce((a, d) => a + (d.meds ? String(d.meds).split(',').filter(Boolean).length : 0), 0);
+  const aw = avgOf(days.map(totalOf)), as = avgOf(days.map(d => Number(d.sleep))), ast = avgOf(days.map(d => Number(d.steps)));
+  const poopDays = days.filter(d => d.poop === '有').length;
+  const wEnd = addDays(start, 6);
+  const periodDays = HIST.periods.filter(p => p.start <= wEnd && p.end >= start)
+    .map(p => mdShort(p.start) + '–' + mdShort(p.end) + (p.end >= INIT.today ? '（進行中）' : ''));
+  // 以「一餐」計算來源（同一餐多張照片只算一次）
+  const mealSrc = {};
+  w.foods.forEach(f => { const k = f.date + f.meal; if (!mealSrc[k]) mealSrc[k] = f.source || ''; });
+  const srcCount = {}; let mealN = 0;
+  Object.values(mealSrc).forEach(s => { mealN++; srcCount[s || '未標記'] = (srcCount[s || '未標記'] || 0) + 1; });
+  const srcText = mealN ? INIT.sources.concat('未標記').filter(s => srcCount[s]).map(s => `${s} ${srcCount[s]}`).join('・') : '—';
+  const outN = (srcCount['外食'] || 0) + (srcCount['超商'] || 0), taggedN = mealN - (srcCount['未標記'] || 0);
+
+  const pendQ = QS.filter(q => q.status !== '已問');
+  const rxNow = rxFor(addDays(start, 6)) || rxFor(start);
+  let h = '';
+  if (pendQ.length) h += `<div class="card advice"><h2>❓ 這次回診要問</h2>
+    ${pendQ.map(q => `<div class="qi"><div class="t">• ${esc(q.text)}</div></div>`).join('')}</div>`;
+  if (rxNow) h += `<div class="card"><h2>💊 本週處方</h2><p style="margin:0">${esc(rxNow.content)}</p>
+    <p class="muted" style="margin:4px 0 0">${esc(mdShort(rxNow.start))} 起・每天 ${esc(rxNow.doses.split(',').filter(Boolean).join('、'))}${rxNow.note ? '・' + esc(rxNow.note) : ''}</p></div>`;
+
+  h += `<div class="card"><h2>📊 一週總覽</h2><div class="stats">
+    <div class="stat"><span class="muted">服藥完成</span><b>${medTotal ? Math.round(medTaken / medTotal * 100) + '%' : '—'}</b><span class="muted">${medTaken}/${medTotal} 次</span></div>
+    <div class="stat"><span class="muted">平均喝水</span><b>${aw ? Math.round(aw).toLocaleString() + ' ml' : '—'}</b></div>
+    <div class="stat"><span class="muted">平均睡眠</span><b>${as ? hmText(as) : '—'}</b></div>
+    <div class="stat"><span class="muted">平均步數</span><b>${ast ? Math.round(ast).toLocaleString() : '—'}</b></div>
+    <div class="stat"><span class="muted">有排便</span><b>${poopDays} / 7 天</b></div>
+    <div class="stat"><span class="muted">經期</span><b style="font-size:15px">${periodDays.length ? periodDays.join('、') : '無'}</b></div>
+    <div class="stat" style="grid-column:1/-1"><span class="muted">外食比例（以餐計）</span>
+      <b>${taggedN ? Math.round(outN / taggedN * 100) + '%' : '—'}</b><span class="muted">${srcText}</span></div>
+  </div></div>`;
+
+  h += `<div class="card"><h2>📅 每日明細</h2><div class="tbl"><table>
+    <tr><th>日期</th><th>服藥</th><th>喝水</th><th>排便</th><th>睡眠</th><th>步數</th><th>經期</th></tr>
+    ${days.map(d => `<tr>
+      <td>${md(d.date)}</td>
+      <td>${d.updated ? (d.meds ? String(d.meds).split(',').filter(Boolean).length : 0) + '/' + planLen(d) : ''}</td>
+      <td>${totalOf(d) ? Math.round(totalOf(d)).toLocaleString() : ''}</td>
+      <td>${d.poop === '有' ? (d.poopType || '有') : (d.poop || '')}</td>
+      <td>${d.sleep ? (d.bedTime ? esc(d.bedTime) + '→' + esc(d.wakeTime || calcWake(d.bedTime, d.sleep)) + '<br>' : '') + hmShort(d.sleep) + (d.sleepQ ? '・' + d.sleepQ : '') : ''}</td>
+      <td>${d.steps ? Number(d.steps).toLocaleString() : ''}</td>
+      <td class="pd">${FLOW_LV[d.period] ? (d.period === '經期中' ? '●' : esc(d.period)) : ''}</td></tr>`).join('')}
+  </table></div><p class="muted" style="margin:6px 0 0">喝水單位：ml</p></div>`;
+
+  h += `<div class="card"><h2>📈 體重・體脂</h2>${chartsHtml()}</div>`;
+
+  h += `<div class="card"><h2>🍱 每天吃了什麼</h2>`;
+  w.dates.forEach(d => {
+    const fs = w.foods.filter(f => f.date === d), dd = w.daily[d] || {};
+    h += `<div class="day"><h3><span>${md(d)}</span><span class="muted">${fs.length} 張</span></h3>
+      ${fs.length ? `<div class="grid">${fs.map(f => photoHtml(f, `openLb('week','${esc(f.id)}')`)).join('')}</div>` : '<p class="muted" style="margin:0">沒有照片</p>'}
+      ${dd.note ? `<p class="muted" style="margin:6px 0 0">📝 ${esc(dd.note)}</p>` : ''}
+      ${dd.exercise ? `<p class="muted" style="margin:2px 0 0">🚶 ${esc(dd.exercise)}</p>` : ''}</div>`;
+  });
+  h += `</div>`;
+  $('weekBody').innerHTML = h;
+}
+
+/* ---------- 折線圖 ---------- */
+function lineChart(pts, label, unit, color) {
+  if (!pts.length) return `<p class="muted">尚無${label}資料</p>`;
+  const W = 320, H = 150, L = 34, R = 14, T = 22, B = 24;
+  const ys = pts.map(p => p.y);
+  let mn = Math.min(...ys), mx = Math.max(...ys);
+  if (mx - mn < 1) { mn -= 0.5; mx += 0.5; }
+  const x = i => pts.length === 1 ? (L + (W - L - R) / 2) : L + i * (W - L - R) / (pts.length - 1);
+  const y = v => T + (mx - v) * (H - T - B) / (mx - mn);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.y).toFixed(1)).join(' ');
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="chart" font-size="10" font-family="sans-serif">
+    <text x="0" y="12" fill="#8a877d" font-size="11">${label}（${unit}）</text>
+    <line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="#e6e1d6"/>
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  pts.forEach((p, i) => {
+    s += `<circle cx="${x(i)}" cy="${y(p.y)}" r="3.5" fill="#fff" stroke="${color}" stroke-width="2"/>
+      <text x="${x(i)}" y="${y(p.y) - 8}" text-anchor="middle" fill="${color}" font-weight="600">${p.y}</text>
+      <text x="${x(i)}" y="${H - 8}" text-anchor="middle" fill="#8a877d">${mdShort(p.d)}</text>`;
+  });
+  return s + '</svg>';
+}
+function chartsHtml() {
+  const v = VISITS.slice(-10);
+  const wp = v.filter(x => x.weight !== '' && x.weight != null).map(x => ({ d: x.date, y: Number(x.weight) }));
+  const fp = v.filter(x => x.fat !== '' && x.fat != null).map(x => ({ d: x.date, y: Number(x.fat) }));
+  return lineChart(wp, '體重', 'kg', '#3f7d4e') + '<div style="height:8px"></div>' + lineChart(fp, '體脂', '%', '#c07a2c');
+}
+
+/* ---------- 長期趨勢 ---------- */
+let TREND = null, TREND_N = 12;
+document.querySelectorAll('#trendRange button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#trendRange button').forEach(x => x.classList.toggle('on', x === b));
+  TREND_N = Number(b.dataset.n); renderTrends();
+});
+async function loadTrends() {
+  $('trendBody').innerHTML = '<p class="muted">載入中…</p>';
+  TREND = await run('getTrends');
+  renderTrends();
+}
+const SRC_COL = { '自煮': '#3f7d4e', '外食': '#d9734e', '超商': '#e6b43c', '未標記': '#cfcac0' };
+
+/** 通用折線圖：pts = [{d, y}]，label 太多時自動跳著顯示 */
+function trendLine(pts, label, unit, color, fmtY, opt) {
+  opt = opt || {};
+  if (pts.filter(p => p.y != null).length < 1) return `<p class="muted">尚無${label}資料</p>`;
+  const W = 340, H = 170, L = 38, R = 12, T = 24, B = 26;
+  const ys = pts.filter(p => p.y != null).map(p => p.y);
+  let mn = opt.min != null ? opt.min : Math.min(...ys), mx = opt.max != null ? opt.max : Math.max(...ys);
+  if (mx - mn < (opt.minSpan || 1)) { const c = (mx + mn) / 2, h = (opt.minSpan || 1) / 2; mn = opt.min != null ? mn : c - h; mx = c + h; }
+  const pd = (mx - mn) * .08; if (opt.min == null) mn -= pd; if (opt.max == null) mx += pd;
+  const n = pts.length, x = i => n === 1 ? (L + (W - L - R) / 2) : L + i * (W - L - R) / (n - 1);
+  const y = v => T + (mx - v) * (H - T - B) / (mx - mn);
+  const every = Math.ceil(n / 7), showVal = n <= 12;
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="chart" font-size="10" font-family="sans-serif">
+    <text x="0" y="12" fill="#8a877d" font-size="11">${label}${unit ? '（' + unit + '）' : ''}</text>`;
+  [0, .5, 1].forEach(f => { const v = mn + (mx - mn) * f;
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#eee9df"/><text x="${L - 4}" y="${y(v) + 3}" text-anchor="end" fill="#aaa59a">${fmtY(v)}</text>`; });
+  if (opt.goal != null) s += `<line x1="${L}" x2="${W - R}" y1="${y(opt.goal)}" y2="${y(opt.goal)}" stroke="${color}" stroke-dasharray="4 4" opacity=".5"/>`;
+  let path = '', pen = false;
+  pts.forEach((p, i) => { if (p.y == null) { pen = false; return; } path += (pen ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.y).toFixed(1); pen = true; });
+  s += `<path d="${path}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  pts.forEach((p, i) => {
+    if (p.y != null) {
+      s += `<circle cx="${x(i)}" cy="${y(p.y)}" r="${n > 20 ? 2.2 : 3.2}" fill="#fff" stroke="${color}" stroke-width="2"/>`;
+      if (showVal || i === n - 1) s += `<text x="${x(i)}" y="${y(p.y) - 7}" text-anchor="middle" fill="${color}" font-weight="600">${fmtY(p.y)}</text>`;
+    }
+    if (i % every === 0 || i === n - 1) s += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" fill="#8a877d">${mdShort(p.d)}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/** 外食／自煮／超商：每週堆疊長條 */
+function srcBars(ws) {
+  const keys = ['自煮', '外食', '超商', '未標記'];
+  const tot = ws.map(w => keys.reduce((a, k) => a + w.src[k], 0));
+  if (!tot.some(t => t)) return '<p class="muted">尚無飲食照片資料</p>';
+  const W = 340, H = 180, L = 30, R = 8, T = 24, B = 26, mx = Math.max(...tot);
+  const bw = (W - L - R) / ws.length, every = Math.ceil(ws.length / 7);
+  let s = `<svg viewBox="0 0 ${W} ${H}" class="chart" font-size="10" font-family="sans-serif">
+    <text x="0" y="12" fill="#8a877d" font-size="11">每週餐數（以餐計）</text>`;
+  [0, .5, 1].forEach(f => { const v = Math.round(mx * f), yy = H - B - (H - T - B) * (mx ? v / mx : 0);
+    s += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="#eee9df"/><text x="${L - 4}" y="${yy + 3}" text-anchor="end" fill="#aaa59a">${v}</text>`; });
+  ws.forEach((w, i) => {
+    let yy = H - B; const x0 = L + i * bw + bw * .15, ww = bw * .7;
+    keys.forEach(k => { const h = mx ? w.src[k] / mx * (H - T - B) : 0;
+      if (h > 0) { yy -= h; s += `<rect x="${x0}" y="${yy}" width="${ww}" height="${h}" fill="${SRC_COL[k]}" rx="1.5"/>`; } });
+    if (i % every === 0 || i === ws.length - 1) s += `<text x="${x0 + ww / 2}" y="${H - 8}" text-anchor="middle" fill="#8a877d">${mdShort(w.start)}</text>`;
+  });
+  return s + '</svg><div class="legend">' + keys.map(k => `<span><i style="background:${SRC_COL[k]}"></i>${k}</span>`).join('') + '</div>';
+}
+
+function renderTrends() {
+  if (!TREND) return;
+  const all = TREND.weeks, ws = TREND_N ? all.slice(-TREND_N) : all;
+  if (!ws.length) { $('trendBody').innerHTML = '<div class="card"><p class="muted" style="margin:0">記錄幾週之後，這裡就會出現趨勢圖 📈</p></div>'; return; }
+  const from = ws[0].start, to = addDays(ws[ws.length - 1].start, 6);
+  const vs = TREND.visits.filter(v => v.date >= from && v.date <= addDays(to, 1));
+  const wp = vs.filter(v => v.weight !== '' && v.weight != null).map(v => ({ d: v.date, y: Number(v.weight) }));
+  const fp = vs.filter(v => v.fat !== '' && v.fat != null).map(v => ({ d: v.date, y: Number(v.fat) }));
+  const wk = f => ws.map(w => ({ d: w.start, y: f(w) }));
+  const diff = (p, u) => p.length >= 2 ? (d => ` <span class="${d < 0 ? 'down' : d > 0 ? 'up' : 'muted'}">${d > 0 ? '+' : ''}${d}${u}</span>`)(n1(p[p.length - 1].y - p[0].y)) : '';
+
+  // 外食比例摘要
+  const sum = { '自煮': 0, '外食': 0, '超商': 0, '未標記': 0 };
+  ws.forEach(w => Object.keys(sum).forEach(k => sum[k] += w.src[k]));
+  const tagged = sum['自煮'] + sum['外食'] + sum['超商'];
+  const outPct = tagged ? Math.round((sum['外食'] + sum['超商']) / tagged * 100) : null;
+  const outLine = wk(w => { const t = w.src['自煮'] + w.src['外食'] + w.src['超商']; return t ? Math.round((w.src['外食'] + w.src['超商']) / t * 100) : null; });
+
+  let h = `<p class="muted" style="margin:0 0 10px">${md(from)} – ${md(to)}・共 ${ws.length} 週（每週三～下週二）</p>`;
+  h += `<div class="card"><h2>⚖️ 體重${diff(wp, 'kg')}</h2>${trendLine(wp, '體重', 'kg', '#3f7d4e', v => n1(v), { minSpan: 2 })}</div>`;
+  h += `<div class="card"><h2>📉 體脂${diff(fp, '%')}</h2>${trendLine(fp, '體脂', '%', '#c07a2c', v => n1(v), { minSpan: 2 })}</div>`;
+  h += `<div class="card"><h2>🍱 自煮・外食・超商</h2>
+    <p style="margin:0 0 6px">這段期間：${Object.keys(sum).filter(k => sum[k]).map(k => `${k} <b>${sum[k]}</b> 餐`).join('・') || '—'}${outPct != null ? `・外食＋超商 <b>${outPct}%</b>` : ''}</p>
+    ${srcBars(ws)}<div style="height:10px"></div>
+    ${trendLine(outLine, '外食＋超商比例', '%', '#d9734e', v => Math.round(v), { min: 0, max: 100 })}</div>`;
+  h += `<div class="card"><h2>💧 平均每日喝水</h2>${trendLine(wk(w => w.water && Math.round(w.water)), '喝水', 'ml', '#3a6ea5', v => Math.round(v).toLocaleString(), { minSpan: 400 })}</div>`;
+  h += `<div class="card"><h2>😴 平均睡眠</h2>${trendLine(wk(w => w.sleep), '睡眠', '', '#7a5fb0', v => hmShort(v), { minSpan: 1 })}</div>`;
+  h += `<div class="card"><h2>🚶 平均步數</h2>${trendLine(wk(w => w.steps && Math.round(w.steps)), '步數', '步', '#2f8f8a', v => Math.round(v).toLocaleString(), { minSpan: 1000 })}</div>`;
+  h += `<div class="card"><h2>💊 服藥完成率</h2>${trendLine(wk(w => w.med == null ? null : Math.round(w.med * 100)), '服藥完成', '%', '#3f7d4e', v => Math.round(v), { min: 0, max: 100 })}</div>`;
+  h += `<div class="card"><h2>🚽 每週排便天數</h2>${trendLine(wk(w => w.logged ? w.poop : null), '有排便', '天', '#8a6d3b', v => Math.round(v), { min: 0, max: 7 })}</div>`;
+  const ps = TREND.periods.filter(p => p.end >= from && p.start <= to);
+  if (ps.length) h += `<div class="card"><h2>🩸 這段期間的經期</h2>${ps.map(p => `<div class="qi"><div class="t">${mdShort(p.start)} – ${mdShort(p.end)}・${p.days} 天${flowDots(p)}
+      <div class="muted">${p.cycle ? '週期 ' + p.cycle + ' 天' : ''}</div></div></div>`).join('')}
+    <p class="muted" style="margin:6px 0 0">經期前後體重、水腫本來就會波動，看體重趨勢時可以對照。</p></div>`;
+  $('trendBody').innerHTML = h;
+}
+
+/* ---------- 回診 ---------- */
+function renderVisits() {
+  renderQuestions(); renderRx();
+  $('vCharts').innerHTML = chartsHtml();
+  if (!VISITS.length) { $('vList').innerHTML = '<p class="muted">還沒有紀錄</p>'; return; }
+  const diff = (a, b, u) => {
+    if (a === '' || b === '' || a == null || b == null) return '';
+    const d = n1(Number(a) - Number(b));
+    return d === 0 ? ` <span class="muted">±0</span>` : ` <span class="${d < 0 ? 'down' : 'up'}">${d > 0 ? '+' : ''}${d}${u}</span>`;
+  };
+  $('vList').innerHTML = VISITS.slice().reverse().map((v, i, arr) => {
+    const p = arr[i + 1] || {};
+    return `<div class="visit"><div class="hd"><b>${md(v.date)}</b>
+        <span><button class="x" onclick="editVisit('${v.date}')">編輯</button><button class="x" onclick="delVisit('${v.date}')">刪除</button></span></div>
+      <div class="num">體重 ${v.weight === '' ? '—' : v.weight + ' kg'}${diff(v.weight, p.weight, 'kg')}
+        ・體脂 ${v.fat === '' ? '—' : v.fat + '%'}${diff(v.fat, p.fat, '%')}</div>
+      ${v.advice ? `<p style="margin:6px 0 0;white-space:pre-wrap">💬 ${esc(v.advice)}</p>` : ''}</div>`;
+  }).join('');
+}
+function editVisit(date) {
+  const v = VISITS.find(x => x.date === date); if (!v) return;
+  $('vDate').value = v.date; $('vWeight').value = v.weight; $('vFat').value = v.fat; $('vAdvice').value = v.advice || '';
+  window.scrollTo(0, 0);
+}
+async function saveVisit() {
+  const v = { date: $('vDate').value, weight: $('vWeight').value, fat: $('vFat').value, advice: $('vAdvice').value.trim() };
+  if (!v.date) return toast('請選日期');
+  if (!v.weight && !v.fat && !v.advice) return toast('請至少填一項');
+  const prev = VISITS.filter(x => x.date < v.date);
+  VISITS = await run('saveVisit', v);
+  celebrateVisit(v, prev);
+  $('vWeight').value = ''; $('vFat').value = ''; $('vAdvice').value = ''; $('vDate').value = INIT.today;
+  updateAdvice(); renderVisits(); toast('已儲存');
+}
+async function delVisit(date) {
+  if (!confirm('刪除 ' + date + ' 的回診紀錄？')) return;
+  VISITS = await run('deleteVisit', date);
+  updateAdvice(); renderVisits(); toast('已刪除');
+}
+function updateAdvice() {
+  const last = VISITS.slice().reverse().find(v => v.advice);
+  $('adviceCard').classList.toggle('hidden', !last);
+  if (last) { $('adviceDate').textContent = md(last.date); $('adviceText').textContent = last.advice; }
+}
+
+/* ---------- 回診要問的問題 ---------- */
+function renderQuestions() {
+  const pend = QS.filter(q => q.status !== '已問');
+  const done = QS.filter(q => q.status === '已問').sort((a, b) => (b.answered || '').localeCompare(a.answered || ''));
+  $('qCount').textContent = pend.length ? `目前有 ${pend.length} 個問題，回診時記得問（在「回診」分頁）` : '';
+  $('qList').innerHTML = pend.length ? pend.map(q => `<div class="qi">
+      <div class="t">${esc(q.text)}<div class="muted">${mdShort(q.created)} 記下</div></div>
+      <button class="sm ok" onclick="answerQ('${q.id}')">已問</button>
+      <button class="x" onclick="delQ('${q.id}')">刪除</button></div>`).join('')
+    : '<p class="muted" style="margin:0">目前沒有要問的問題</p>';
+  $('qDone').innerHTML = done.length ? `<details><summary>已問過的問題（${done.length}）</summary>
+      ${done.map(q => `<div class="qi"><div class="t">${esc(q.text)}
+        ${q.answer ? `<div class="a">💬 ${esc(q.answer)}</div>` : ''}
+        <div class="muted">${q.answered ? mdShort(q.answered) + ' 問過' : ''}</div></div>
+        <button class="x" onclick="answerQ('${q.id}')">修改</button>
+        <button class="x" onclick="reopenQ('${q.id}')">改回待問</button></div>`).join('')}</details>` : '';
+}
+async function addQ(inputId) {
+  const t = $(inputId).value.trim();
+  if (!t) return;
+  QS = await run('addQuestion', t);
+  $(inputId).value = ''; renderQuestions(); toast('已記下');
+}
+async function answerQ(id) {
+  const q = QS.find(x => x.id === id); if (!q) return;
+  const a = prompt('醫師怎麼回答？（可留空）', q.answer || '');
+  if (a === null) return;
+  QS = await run('updateQuestion', Object.assign({}, q, { status: '已問', answer: a.trim() }));
+  renderQuestions(); toast('已更新');
+}
+async function reopenQ(id) {
+  const q = QS.find(x => x.id === id); if (!q) return;
+  QS = await run('updateQuestion', Object.assign({}, q, { status: '待問', answered: '' }));
+  renderQuestions();
+}
+async function delQ(id) {
+  if (!confirm('刪除這個問題？')) return;
+  QS = await run('deleteQuestion', id); renderQuestions();
+}
+
+/* ---------- 處方紀錄 ---------- */
+/** 處方期間的體重、體脂變化：開始日當天或之前最近一次回診 → 期間內最後一次回診 */
+function rxEffect(r) {
+  const end = r.end || INIT.today;
+  const before = VISITS.filter(v => v.date <= r.start);
+  const within = VISITS.filter(v => v.date > r.start && v.date <= end);
+  const a = before[before.length - 1] || VISITS.find(v => v.date >= r.start && v.date <= end);
+  const b = within[within.length - 1];
+  if (!a || !b || a === b) return '';
+  const part = (k, u) => (a[k] === '' || b[k] === '' || a[k] == null || b[k] == null) ? '' :
+    (d => `${u === 'kg' ? '體重' : '體脂'} <span class="${d < 0 ? 'down' : d > 0 ? 'up' : ''}">${d > 0 ? '+' : ''}${d}${u}</span>`)(n1(Number(b[k]) - Number(a[k])));
+  const s = [part('weight', 'kg'), part('fat', '%')].filter(Boolean).join('・');
+  return s ? `<div style="font-size:14px;margin-top:4px">期間 ${s} <span class="muted">（${mdShort(a.date)}→${mdShort(b.date)}）</span></div>` : '';
+}
+function renderRx() {
+  const cur = rxFor(INIT.today);
+  $('rxList').innerHTML = RX.length ? RX.slice().reverse().map(r => `<div class="rx ${r === cur ? 'cur' : ''}">
+      <div class="hd"><b>${mdShort(r.start)} – ${r.end ? mdShort(r.end) : '至今'}${r === cur ? '<span class="badge">目前</span>' : ''}</b>
+        <span><button class="x" onclick="editRx('${r.id}')">編輯</button><button class="x" onclick="delRx('${r.id}')">刪除</button></span></div>
+      <div style="white-space:pre-wrap">${esc(r.content)}</div>
+      <div class="muted">每天 ${esc(r.doses.split(',').filter(Boolean).join('、') || '—')}${r.note ? '・' + esc(r.note) : ''}</div>
+      ${rxEffect(r)}
+      <div class="row" style="margin-top:8px;gap:6px">
+        ${r.photos.map(p => `<div class="ph" style="width:64px;flex:none" onclick="window.open('${esc(p.url)}','_blank')">
+          <img src="${esc(p.thumb)}"><button class="x" style="position:absolute;right:2px;top:2px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:20px;height:20px;padding:0;font-size:12px;line-height:20px"
+            onclick="event.stopPropagation();delRxPhoto('${esc(p.id)}')">×</button></div>`).join('')}
+        <label class="sm ok" style="cursor:pointer">📷 ${r.photos.length ? '再加一張' : '上傳處方簽'}
+          <input type="file" accept="image/*" multiple class="hidden" onchange="addRxPhotos('${r.id}', this)"></label>
+      </div></div>`).join('')
+    : '<p class="muted" style="margin:0">還沒有處方紀錄</p>';
+}
+function rxDoseSeg(sel) {
+  const set = new Set(sel);
+  $('rxDoses').innerHTML = INIT.doseOptions.map(d => `<button class="chip ${set.has(d) ? 'on' : ''}" data-v="${d}">${d}</button>`).join('');
+  $('rxDoses').querySelectorAll('button').forEach(b => b.onclick = () => b.classList.toggle('on'));
+}
+function resetRxForm() {
+  RX_EDIT = null;
+  $('rxStart').value = INIT.today; $('rxEnd').value = ''; $('rxContent').value = ''; $('rxNote').value = '';
+  RX_FILES = []; $('rxPrev').innerHTML = '';
+  rxDoseSeg(INIT.defaultDoses);
+  $('rxFormTitle').textContent = '＋ 醫師換藥了？新增處方';
+  $('rxFormBox').open = false;
+}
+function editRx(id) {
+  const r = RX.find(x => x.id === id); if (!r) return;
+  RX_EDIT = id;
+  $('rxStart').value = r.start; $('rxEnd').value = r.end; $('rxContent').value = r.content; $('rxNote').value = r.note || '';
+  rxDoseSeg(r.doses.split(','));
+  $('rxFormTitle').textContent = '編輯處方';
+  $('rxFormBox').open = true; $('rxFormBox').scrollIntoView({ behavior: 'smooth' });
+}
+async function saveRx() {
+  const doses = Array.from($('rxDoses').querySelectorAll('button.on')).map(b => b.dataset.v);
+  const r = { id: RX_EDIT || '', start: $('rxStart').value, end: $('rxEnd').value, content: $('rxContent').value.trim(),
+              doses: INIT.doseOptions.filter(d => doses.includes(d)).join(','), note: $('rxNote').value.trim() };
+  if (!r.start || !r.content) return toast('請填開始日期和處方內容');
+  if (!r.doses) return toast('請選服藥時段');
+  const files = RX_FILES.slice();
+  const res = await run('saveRx', r);
+  RX = res.list;
+  resetRxForm(); renderRx(); buildMedSeg(CUR); paint(); toast('處方已儲存');
+  if (files.length) await uploadRxImgs(res.id, files);
+}
+
+/* ---------- 處方簽照片 ---------- */
+let RX_FILES = [];
+$('rxFile').onchange = async e => {
+  const files = Array.from(e.target.files); e.target.value = '';
+  for (const f of files) { try { RX_FILES.push(await loadImg(f)); } catch (err) {} }
+  $('rxPrev').innerHTML = RX_FILES.map(i => `<img src="${toJpeg(i, 160, 0.6)}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;flex:none">`).join('');
+};
+async function uploadRxImgs(rxId, imgs) {
+  for (let i = 0; i < imgs.length; i++) {
+    toast(`處方簽上傳中 ${i + 1}/${imgs.length}…`, 10000);
+    try {
+      // 處方簽要看得清楚字，原圖用較高解析度
+      const full = toJpeg(imgs[i], 2200, 0.88);
+      let thumb = toJpeg(imgs[i], 320, 0.6);
+      if (thumb.length > 45000) thumb = toJpeg(imgs[i], 220, 0.5);
+      RX = await run('uploadRxPhoto', { rxId, full, thumb });
+      renderRx();
+    } catch (err) { toast('第 ' + (i + 1) + ' 張上傳失敗', 3000); }
+  }
+  toast('處方簽已上傳到雲端「處方簽」資料夾', 2500);
+}
+async function addRxPhotos(rxId, input) {
+  const files = Array.from(input.files); input.value = '';
+  const imgs = [];
+  for (const f of files) { try { imgs.push(await loadImg(f)); } catch (err) {} }
+  if (imgs.length) await uploadRxImgs(rxId, imgs);
+}
+async function delRxPhoto(fileId) {
+  if (!confirm('刪除這張處方簽照片？')) return;
+  RX = await run('deleteRxPhoto', fileId); renderRx(); toast('已刪除');
+}
+async function delRx(id) {
+  if (!confirm('刪除這張處方紀錄？（處方簽照片也會一起移到垃圾桶）')) return;
+  RX = await run('deleteRx', id); renderRx(); buildMedSeg(CUR); paint();
+}
+
+/* ---------- 經期 ---------- */
+const dDiff = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+const flowDots = p => `<span class="flowdots">${p.flows.map(f => `<i class="f${FLOW_LV[f.flow] || 2}" title="${esc(mdShort(f.date) + ' ' + f.flow)}"></i>`).join('')}</span>`;
+function renderPeriod() {
+  const ps = HIST.periods;
+  const cur = ps.find(p => p.start <= CUR && dDiff(p.end, CUR) <= 1 && FLOW_LV[D.period]) || ps.find(p => p.start <= CUR && p.end >= CUR);
+  const last = ps.filter(p => p.start <= CUR).pop();
+  let info = '';
+  if (cur) info = `這次經期 ${mdShort(cur.start)} 開始・今天第 <b>${dDiff(cur.start, CUR) + 1}</b> 天`;
+  else if (last) info = `上次經期 ${mdShort(last.start)}–${mdShort(last.end)}（${last.days} 天）・距離上次開始 ${dDiff(last.start, CUR)} 天`;
+  $('pInfo').innerHTML = info; $('pInfo').classList.toggle('hidden', !info);
+  const done = ps.slice(-6).reverse();
+  $('pHist').innerHTML = done.length ? `<details><summary>歷次經期（${ps.length}）</summary>
+    ${done.map(p => `<div class="qi"><div class="t">${mdShort(p.start)} – ${mdShort(p.end)}・${p.days} 天${flowDots(p)}
+      <div class="muted">${p.cycle ? '週期 ' + p.cycle + ' 天' : (p.end >= addDays(INIT.today, -1) ? '進行中' : '')}</div></div></div>`).join('')}
+    <p class="muted" style="margin:6px 0 0">依每天填的量自動串起來；圓點越深代表量越多。</p></details>` : '';
+}
+
+/* ---------- 每日加油 ---------- */
+const CHEERS = [
+  ['🌱', '記錄不是為了完美，是為了更了解自己'],
+  ['💧', '水壺喝了嗎？身體會謝謝你'],
+  ['🐢', '慢慢來，比較快'],
+  ['📷', '每一張照片，都是對自己的一份關心'],
+  ['🌙', '今天也要好好吃飯、好好睡覺'],
+  ['💪', '不用每天都很厲害，有在前進就很好'],
+  ['🍵', '累了就休息一下，明天繼續'],
+  ['☀️', '新的一天，從一杯水開始'],
+  ['🌷', '對自己溫柔一點，你已經很努力了'],
+  ['🎯', '小小的習慣，會累積成大大的改變']
+];
+function streak() {
+  const set = new Set(HIST.logged);
+  let d = set.has(INIT.today) ? INIT.today : addDays(INIT.today, -1), n = 0;
+  while (set.has(d)) { n++; d = addDays(d, -1); }
+  return n;
+}
+function renderCheer() {
+  const show = CUR === INIT.today;
+  $('cheer').classList.toggle('hidden', !show);
+  if (!show) return;
+  const seed = Number(INIT.today.replace(/-/g, '')) % CHEERS.length, c = CHEERS[seed];
+  $('cheerEm').textContent = c[0]; $('cheerMsg').textContent = c[1];
+  const n = streak();
+  $('cheerStreak').textContent = n >= 2 ? `🔥 已連續記錄 ${n} 天` : n === 1 ? '✨ 今天開始記錄了，明天繼續！' : '';
+}
+
+/** 今天的紀錄都填完 → 放煙火（一天一次） */
+function isComplete() {
+  const plan = planFor(CUR), meds = (D.meds || '').split(',').filter(Boolean);
+  return FOODS.length > 0 && meds.length >= plan.length && ((Number(D.water) || 0) + (Number(D.otherMl) || 0)) > 0
+    && D.poop && D.sleep && D.steps && D.period;
+}
+function checkComplete() {
+  if (CUR !== INIT.today || !isComplete()) return;
+  let k = 'done-' + INIT.today, seen = false;
+  try { seen = localStorage.getItem(k) === '1'; localStorage.setItem(k, '1'); } catch (e) { seen = !!window[k]; window[k] = 1; }
+  if (seen) return;
+  const n = streak();
+  celebrate('🎉', '今天的紀錄全部完成！', n >= 2 ? `已經連續記錄 ${n} 天了，太厲害了！` : '好好休息，明天見 🌙', 'confetti');
+}
+
+/* ---------- 回診鼓勵 ---------- */
+function celebrateVisit(v, prev) {
+  const pw = prev.filter(x => x.weight !== '' && x.weight != null).pop();
+  const pf = prev.filter(x => x.fat !== '' && x.fat != null).pop();
+  const dw = v.weight !== '' && pw ? n1(Number(v.weight) - Number(pw.weight)) : null;
+  const df = v.fat !== '' && pf ? n1(Number(v.fat) - Number(pf.fat)) : null;
+  if (!prev.length) return celebrate('🚀', '第一次回診紀錄完成！', '開始就是最難的一步，\n你已經跨出去了 💪', 'confetti');
+  if (dw !== null && dw < 0) return celebrate('🏆', `比上次少了 ${-dw} kg！`, (df !== null && df < 0 ? `體脂也降了 ${-df}%。\n` : '') + '你的努力看得見，繼續保持 ✨', 'confetti');
+  if (df !== null && df < 0) return celebrate('🌟', `體脂降了 ${-df}%！`, '體重不是唯一的指標，\n身體正在慢慢變好 💪', 'confetti');
+  if (dw !== null || df !== null) return celebrate('🌱', '這週辛苦了', '體重本來就會上下起伏，\n經期、水分都會影響。\n持續記錄就是最好的進步，下週繼續加油！', 'float');
+  celebrate('📝', '回診紀錄完成', '醫師的建議記下來了，\n這週一起照著做 💪', 'float');
+}
+
+/* ---------- 全螢幕動畫 ---------- */
+let celeTimer = null, fxId = 0;
+function celebrate(em, title, text, kind) {
+  $('celeEm').textContent = em; $('celeTitle').textContent = title; $('celeText').textContent = text;
+  $('cele').className = kind === 'float' ? 'gentle' : 'party';
+  if (navigator.vibrate) try { navigator.vibrate(kind === 'float' ? 60 : [80, 60, 120]); } catch (e) {}
+  runFx(kind === 'float' ? 'gentle' : 'party', em);
+  clearTimeout(celeTimer); celeTimer = setTimeout(closeCele, 7000);
+}
+function closeCele() {
+  $('cele').classList.add('hidden'); clearTimeout(celeTimer);
+  fxId++; const c = $('fx'); c.getContext('2d').clearRect(0, 0, c.width, c.height);   // 關掉時一併停止動畫
+}
+
+function fxCanvas() {
+  const c = $('fx'), r = window.devicePixelRatio || 1;
+  c.width = innerWidth * r; c.height = innerHeight * r;
+  const g = c.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); return g;
+}
+
+/** party：煙火＋彩帶雨＋大表情雨；gentle：滿版漂浮愛心葉子＋閃光 */
+function runFx(mode, em) {
+  const id = ++fxId, g = fxCanvas(), W = innerWidth, H = innerHeight;
+  const COL = ['#ff5d73', '#6cc9a1', '#4cc38a', '#3d8bfd', '#b06dff', '#ff9f7a', '#21c7d9', '#1f1f1f'];
+  const pick = a => a[Math.random() * a.length | 0];
+  const P = [], dur = mode === 'party' ? 7000 : 6500, t0 = performance.now();
+  let lastBoom = 0, lastRain = 0;
+
+  const confettiBurst = (x, y, n, power) => { for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, v = Math.random() * power;
+    P.push({ k: 'c', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - power * .4, w: 7 + Math.random() * 7, h: 10 + Math.random() * 10,
+             r: Math.random() * 6, vr: (Math.random() - .5) * .5, c: pick(COL), life: 1 }); } };
+  const firework = () => {
+    const x = W * (.12 + Math.random() * .76), y = H * (.12 + Math.random() * .45), c = pick(COL), n = 60 + (Math.random() * 30 | 0);
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, v = 3 + Math.random() * 4.5;
+      P.push({ k: 's', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, c: Math.random() < .25 ? '#fff' : c, life: 1, dec: .012 + Math.random() * .01, sz: 2 + Math.random() * 2.5 }); }
+  };
+  const ems = mode === 'party' ? [em, '🎉', '✨', '⭐', '💖', '🎊', em] : [em, '💚', '🌱', '✨', '🌸', '💪', '🍀'];
+
+  // 開場：畫面四周同時炸彩帶
+  if (mode === 'party') {
+    confettiBurst(W * .5, H * .45, 160, 18);
+    confettiBurst(0, H, 90, 22); confettiBurst(W, H, 90, 22);
+    confettiBurst(0, H * .3, 50, 16); confettiBurst(W, H * .3, 50, 16);
+  } else {
+    for (let i = 0; i < 70; i++) P.push({ k: 'e', e: pick(ems), x: Math.random() * W, y: H + Math.random() * H, vy: -(1.3 + Math.random() * 2.4),
+      sz: 26 + Math.random() * 34, ph: Math.random() * 6, sw: 10 + Math.random() * 25 });
+  }
+
+  (function frame(t) {
+    if (id !== fxId) return;
+    const el = t - t0;
+    g.clearRect(0, 0, W, H);
+
+    if (mode === 'party' && el < 4800) {
+      if (el - lastBoom > 380) { lastBoom = el; firework(); if (Math.random() < .5) firework(); }
+      if (el - lastRain > 90) { lastRain = el;
+        for (let i = 0; i < 6; i++) P.push({ k: 'c', x: Math.random() * W, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 3,
+          w: 7 + Math.random() * 6, h: 10 + Math.random() * 9, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: pick(COL), life: 1 });
+        if (Math.random() < .45) P.push({ k: 'e', e: pick(ems), x: Math.random() * W, y: -60, vy: 2.5 + Math.random() * 3.5, sz: 34 + Math.random() * 40, ph: Math.random() * 6, sw: 8, rot: (Math.random() - .5) * .04, a: 0 });
+      }
+    }
+    if (mode === 'gentle' && el < 4500 && Math.random() < .25)
+      P.push({ k: 's', x: Math.random() * W, y: Math.random() * H, vx: 0, vy: -.3, c: '#fff', life: 1, dec: .02, sz: 2 + Math.random() * 3 });
+
+    for (let i = P.length - 1; i >= 0; i--) {
+      const p = P[i];
+      if (p.k === 'c') {                       // 彩帶
+        p.vy += .28; p.vx *= .985; p.vy = Math.min(p.vy, 7); p.x += p.vx + Math.sin((t + i * 40) / 300) * .8; p.y += p.vy; p.r += p.vr;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.scale(1, Math.cos(t / 120 + i)); g.fillStyle = p.c;
+        g.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); g.restore();
+        if (p.y > H + 40) P.splice(i, 1);
+      } else if (p.k === 's') {                // 煙火火花／閃光
+        p.vx *= .97; p.vy = p.vy * .97 + .06; p.x += p.vx; p.y += p.vy; p.life -= p.dec;
+        g.globalAlpha = Math.max(0, p.life); g.fillStyle = p.c; g.beginPath(); g.arc(p.x, p.y, p.sz, 0, 7); g.fill(); g.globalAlpha = 1;
+        if (p.life <= 0) P.splice(i, 1);
+      } else {                                 // 大表情
+        p.y += p.vy; p.a = (p.a || 0) + (p.rot || 0);
+        const x = p.x + Math.sin(t / 600 + p.ph) * p.sw;
+        g.save(); g.translate(x, p.y); g.rotate(p.a);
+        if (mode === 'gentle') g.globalAlpha = Math.max(0, Math.min(1, p.y / H * 1.6));
+        g.font = p.sz + 'px "Apple Color Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.fillText(p.e, 0, 0); g.restore();
+        if (p.y > H + 80 || p.y < -80) P.splice(i, 1);
+      }
+    }
+    if (el < dur || P.length) { if (el < dur + 4000) return requestAnimationFrame(frame); }
+    g.clearRect(0, 0, W, H);
+  })(t0);
+}
+
+/** 每次打開網站：全螢幕加油 */
+function dailyHello() {
+  // 每次進來都加油，隨機換一句（不和上一次重複）
+  let last = -1;
+  try { last = Number(localStorage.getItem('lastCheer') ?? -1); } catch (e) {}
+  let i = Math.floor(Math.random() * CHEERS.length);
+  if (i === last) i = (i + 1) % CHEERS.length;
+  try { localStorage.setItem('lastCheer', String(i)); } catch (e) {}
+  const c = CHEERS[i], n = streak();
+  const sub = n >= 2 ? `🔥 已連續記錄 ${n} 天，今天也一起加油！` : '今天也一起加油！';
+  setTimeout(() => celebrate(c[0], c[1], sub, 'float'), 500);
+}
+
+/* ---------- 放大看照片 ---------- */
+let WEEK_FOODS = [], LB = null;
+const FULL = {};                                   // 已載入的原圖（這次開網站有效）
+function openLb(from, id) {
+  const list = from === 'week' ? WEEK_FOODS : FOODS;
+  const i = list.findIndex(f => f.id === id);
+  if (i < 0) return;
+  LB = { list, i };
+  $('lb').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  showLb();
+}
+function closeLb() { LB = null; $('lb').classList.add('hidden'); document.body.style.overflow = ''; }
+function lbGo(n) {
+  if (!LB) return;
+  const j = LB.i + n;
+  if (j < 0 || j >= LB.list.length) return;
+  LB.i = j; showLb();
+}
+async function showLb() {
+  const f = LB.list[LB.i], img = $('lbImg');
+  img.style.transform = '';
+  $('lbCount').textContent = (LB.i + 1) + ' / ' + LB.list.length;
+  $('lbPrev').classList.toggle('hidden', LB.i === 0);
+  $('lbNext').classList.toggle('hidden', LB.i === LB.list.length - 1);
+  $('lbCap').innerHTML = `<span class="chipd">${esc(md(f.date))}</span><span class="chipd">${esc(f.meal)} ${esc(f.time)}</span>` +
+    (f.source ? `<span class="chipd">${esc(f.source)}</span>` : '') +
+    (f.note ? `<div style="margin-top:6px">${esc(f.note)}</div>` : '') +
+    `<div style="margin-top:6px"><a href="${esc(f.url)}" target="_blank">在雲端開啟</a></div>`;
+  const shown = () => { img.classList.remove('blur'); $('lbLoad').classList.add('hidden'); };
+  if (FULL[f.id]) { img.onerror = null; img.src = FULL[f.id]; shown(); return; }
+  img.onerror = null; img.src = f.thumb; img.classList.add('blur');
+  $('lbLoad').textContent = '載入原圖中…'; $('lbLoad').classList.remove('hidden');
+  const src = await fullSrc(f.id);
+  if (!LB || LB.list[LB.i].id !== f.id) return;
+  if (src) { img.src = src; shown(); } else $('lbLoad').textContent = '原圖載入失敗，可點「在雲端開啟」';
+}
+
+/** 原圖來源：先用 Google 雲端的圖片網址（快、會被瀏覽器快取）；不行再改由程式讀檔 */
+let DIRECT_OK = null;                              // null=還不知道 true=可直接讀 false=要走程式
+const driveUrl = id => 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w1600';
+function tryDirect(id) {
+  return new Promise(res => {
+    const im = new Image(), t = setTimeout(() => res(false), 6000);
+    im.onload = () => { clearTimeout(t); res(im.naturalWidth > 1); };
+    im.onerror = () => { clearTimeout(t); res(false); };
+    im.src = driveUrl(id);
+  });
+}
+async function fullSrc(id) {
+  if (FULL[id]) return FULL[id];
+  if (DIRECT_OK !== false) {
+    const ok = await tryDirect(id);
+    if (ok) { DIRECT_OK = true; return FULL[id] = driveUrl(id); }
+    DIRECT_OK = false;
+  }
+  try { return FULL[id] = await run('getPhoto', id); } catch (e) { return ''; }
+}
+
+/** 打開本週摘要時，就先在背景把原圖載好 */
+async function prefetchWeek(list) {
+  if (!list.length) return;
+  if (DIRECT_OK === null) await fullSrc(list[0].id);
+  if (DIRECT_OK) { list.forEach(f => { FULL[f.id] = driveUrl(f.id); new Image().src = driveUrl(f.id); }); return; }
+  const need = list.map(f => f.id).filter(id => !FULL[id]);
+  for (let i = 0; i < need.length; i += 4) {          // 每次 4 張，同時送出
+    run('getPhotos', need.slice(i, i + 4)).then(m => Object.assign(FULL, m)).catch(() => {});
+  }
+}
+// 左右滑動切換、點兩下放大
+(() => {
+  let x0 = null, y0 = null, lastTap = 0;
+  const st = $('lbStage');
+  st.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  st.addEventListener('touchend', e => {
+    if (x0 == null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) lbGo(dx < 0 ? 1 : -1);
+    else if (Math.abs(dy) > 90 && dy > 0) closeLb();             // 往下滑關閉
+    x0 = null;
+  });
+  $('lbImg').addEventListener('click', () => {
+    const now = Date.now(), img = $('lbImg');
+    if (now - lastTap < 300) img.style.transform = img.style.transform ? '' : 'scale(2)';
+    lastTap = now;
+  });
+  st.addEventListener('click', e => { if (e.target === st) closeLb(); });
+  document.addEventListener('keydown', e => {
+    if (!LB) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowLeft') lbGo(-1);
+    if (e.key === 'ArrowRight') lbGo(1);
+  });
+})();
+
+/* ---------- 啟動 ---------- */
+function showErr(msg) {
+  let el = $('errBox');
+  if (!el) { el = document.createElement('div'); el.id = 'errBox';
+    el.style.cssText = 'position:fixed;left:8px;right:8px;top:8px;z-index:99;background:#fde6e3;border:2px solid #1f1f1f;border-radius:12px;padding:10px;font-size:13px;white-space:pre-wrap;word-break:break-all';
+    el.onclick = () => el.remove(); document.body.appendChild(el); }
+  el.textContent = '⚠ 網頁錯誤（截圖給 Claude，點一下關閉）\n' + msg;
+}
+window.addEventListener('error', e => showErr((e.message || '') + (e.lineno ? '（第 ' + e.lineno + ' 行）' : '')));
+window.addEventListener('unhandledrejection', e => showErr(String((e.reason && (e.reason.stack || e.reason.message)) || e.reason)));
+window.addEventListener('beforeunload', () => { if (dirty) flushSave(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushSave(); });
+
+(async () => {
+  try { INIT = await run('getInit'); } catch (e) { showErr('初始資料讀取失敗：' + (e.message || e)); return; }
+  if (!INIT) { showErr('初始資料是空的（getInit 回傳 null），請把這個畫面截圖給 Claude'); return; }
+  VISITS = INIT.visits; RX = INIT.rx; QS = INIT.questions; HIST = INIT.history;
+  WEEK_START = visitWeekStart(INIT.today);
+  $('vDate').value = INIT.today;
+  $('heroDate').textContent = INIT.today + '（週' + WD[new Date(INIT.today + 'T00:00:00').getDay()] + '）';
+  $('sheetLink').href = INIT.sheetUrl;
+  buildSegs(); updateAdvice(); resetRxForm(); renderQuestions();
+  loadDay(INIT.today);
+  dailyHello();
+})();
+</script>
+</body>
+</html>
