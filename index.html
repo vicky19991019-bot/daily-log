@@ -600,11 +600,12 @@ function getKey() {
   return keyAsk;
 }
 function resetKey() { try { localStorage.removeItem(KEY_LS); } catch (e) {} location.reload(); }
-async function run(fn, ...args) {
+function run(fn, ...args) { return runOpt({}, fn, ...args); }
+async function runOpt(opt, fn, ...args) {
   try {
     const key = await getKey();
     let r;
-    try { r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args, key }) }); }
+    try { r = await fetch(API_URL, { method: 'POST', keepalive: !!opt.keepalive, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args, key }) }); }
     catch (e) { throw new Error('無法連到雲端（請檢查網路，或 Apps Script 存取權是否設為「任何人」）'); }
     let j;
     try { j = await r.json(); } catch (e) { throw new Error('雲端回應格式錯誤，請確認 Apps Script 已部署最新版本'); }
@@ -613,7 +614,7 @@ async function run(fn, ...args) {
       throw new Error(j.error || '未知錯誤');
     }
     return j.data;
-  } catch (e) { toast('錯誤：' + (e.message || e), 4000); throw e; }
+  } catch (e) { if (!opt.quiet) toast('錯誤：' + (e.message || e), 4000); throw e; }
 }
 
 /** 依用餐時間推測餐別 */
@@ -732,7 +733,14 @@ async function flushSave() {
   if (!dirty) return;
   dirty = false;
   const date = D.date;
-  const t = await run('saveDaily', Object.assign({}, D));
+  const bg = document.hidden;          // 切到相機或其他 App 時
+  let t;
+  try { t = await runOpt({ keepalive: bg, quiet: bg }, 'saveDaily', Object.assign({}, D)); }
+  catch (e) {
+    dirty = true;                      // 沒存到就保留，回到網頁時再存一次
+    $('savedAt').textContent = '尚未儲存，回到網頁時會再試一次';
+    return;
+  }
   $('savedAt').textContent = '已自動儲存 ' + t.slice(11);
   if (!HIST.logged.includes(date)) { HIST.logged.push(date); HIST.logged.sort(); }
   if (periodDirty) { periodDirty = false; HIST = await run('getHistory'); }
@@ -1567,7 +1575,7 @@ function showErr(msg) {
 window.addEventListener('error', e => showErr((e.message || '') + (e.lineno ? '（第 ' + e.lineno + ' 行）' : '')));
 window.addEventListener('unhandledrejection', e => showErr(String((e.reason && (e.reason.stack || e.reason.message)) || e.reason)));
 window.addEventListener('beforeunload', () => { if (dirty) flushSave(); });
-document.addEventListener('visibilitychange', () => { if (document.hidden) flushSave(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden || dirty) flushSave(); });
 
 (async () => {
   try { INIT = await run('getInit'); } catch (e) { showErr('初始資料讀取失敗：' + (e.message || e)); return; }
